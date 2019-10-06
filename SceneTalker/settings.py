@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'rest_auth',
     'rest_framework',
     'rest_framework.authtoken',
-    
+
     'user',
 ]
 
@@ -138,5 +138,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ]
 }
+
+SITE_ID = 1
 
 ACCOUNT_EMAIL_REQUIRED = False
