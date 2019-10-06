@@ -31,6 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    'channels_redis',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +50,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     'user',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -142,3 +146,14 @@ REST_FRAMEWORK = {
 SITE_ID = 1
 
 ACCOUNT_EMAIL_REQUIRED = False
+
+# Channels
+ASGI_APPLICATION = 'SceneTalker.routing.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
