@@ -1,11 +1,48 @@
 import requests
 from bs4 import BeautifulSoup as bs
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 
 class Crawler:
     def __init__(self):
         pass
+
+    def get_live_drama_list(self):
+        drama_list = []
+        u1 = 1
+        while True:
+            params = (
+                ('where', 'nexearch'),
+                ('pkid', '57'),
+                ('key', 'BroadcastListAPI'),
+                ('u1', u1),
+                ('u2', '8'),
+                ('u3', 's3.asc'),
+                ('u4', 'KR'),
+                ('u5', 'drama'),
+                ('u6', 'ing'),
+                ('u7', ''),
+                ('u8', ''),
+                ('u9', ''),
+                ('_callback', 'jQuery1124014662727284181387_1570449645314'),
+            )
+            response = requests.get('https://search.naver.com/p/csearch/content/nqapirender.nhn', params=params)
+
+            html = response.text.split('sHtml" : " ')[1]
+            soup = bs(html, 'html.parser')
+
+            dt_tags = soup.find_all('dt')
+            if dt_tags:
+                for dt in dt_tags:
+                    drama_name = dt.find('a').text.split('<')[0]
+                    if 'KBS' in drama_name:
+                        continue
+                    drama_list.append(drama_name)
+                u1 += 6
+            else:
+                break
+
+        return drama_list
 
     def get_detail_in_naver(self, keyword):
         def search_keyword(keyword):
@@ -35,44 +72,33 @@ class Crawler:
             return response.text
 
         html = search_keyword(keyword)
+        html_for_genre = search_keyword(f'{keyword} 장르')
         soup = bs(html, 'html.parser')
+        soup_genre = bs(html_for_genre, 'html.parser')
+
         detail = soup.find(id='brcs_detail')
+        summary = detail.find(id='layer_sy').text.strip()
+        broadcasting_station = detail.find('dd').find('span').find('a').text
+        is_broadcasiting = detail.find('dd').find('span').select_one('.broad_txt').text
+
         try:
             rating = detail.select_one('.fred').text
         except AttributeError:
             rating = '알수없음'
-        summary = detail.find(id='layer_sy').text.strip()
-
-        return {'rating': rating, 'summary': summary}
-
-    def get_detail_in_wiki(self, keyword):
-        def search_keyword(keyword):
-            response = requests.get(f'https://ko.wikipedia.org/wiki/{keyword}')
-            assert response.ok, response.reason
-            return response.text
 
         try:
-            html = search_keyword(quote(keyword))
-            assert '장르' in html and '방송 채널' in html, 'keyword 뒤에 (드라마)를 붙여야 한다.'
-        except AssertionError:
-            html = search_keyword(f'{quote(keyword)}_({quote("드라마")})')
+            genre = soup_genre.select_one('.v').text
+        except AttributeError:
+            genre = '드라마'
 
-        soup = bs(html, 'html.parser')
-        table = soup.select_one('.infobox')
-        info = {}
-        for tr in table.select_one('tbody').find_all('tr')[2:]:
-            info.update({
-                tr.select_one('th').text.strip(): tr.select_one('td').text.strip()
-            })
-
-        return info
+        return {'rating': rating, 'summary': summary, 'genre': genre, 'broadcasting_station': broadcasting_station,
+                'is_broadcasiting': is_broadcasiting}
 
 
 if __name__ == "__main__":
     crawler = Crawler()
-    naver_info = crawler.get_detail_in_naver('배가본드')
-    wiki_info = crawler.get_detail_in_wiki('배가본드')
 
-    drama_info = {**naver_info, **wiki_info}
-    from pprint import pprint
-    pprint(drama_info)
+    live_drama_list = crawler.get_live_drama_list()
+    for drama in live_drama_list:
+        print(drama)
+        print(crawler.get_detail_in_naver(drama))
