@@ -51,6 +51,8 @@ INSTALLED_APPS = [
 
     'user',
     'chat',
+    'drama',
+    'taggit',
 ]
 
 MIDDLEWARE = [
