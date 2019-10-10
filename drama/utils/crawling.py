@@ -1,21 +1,18 @@
-import requests
+from drama.models import Drama
 from bs4 import BeautifulSoup as bs
-from urllib.parse import quote, unquote
+import requests
 
 
 class Crawler:
-    def __init__(self):
-        pass
-
     def get_live_drama_list(self):
         drama_list = []
-        u1 = 1
+        count = 1
         while True:
             params = (
                 ('where', 'nexearch'),
                 ('pkid', '57'),
                 ('key', 'BroadcastListAPI'),
-                ('u1', u1),
+                ('u1', count),
                 ('u2', '8'),
                 ('u3', 's3.asc'),
                 ('u4', 'KR'),
@@ -35,10 +32,8 @@ class Crawler:
             if dt_tags:
                 for dt in dt_tags:
                     drama_name = dt.find('a').text.split('<')[0]
-                    if 'KBS' in drama_name:
-                        continue
                     drama_list.append(drama_name)
-                u1 += 6
+                count += 6
             else:
                 break
 
@@ -77,28 +72,35 @@ class Crawler:
         soup_genre = bs(html_for_genre, 'html.parser')
 
         detail = soup.find(id='brcs_detail')
-        summary = detail.find(id='layer_sy').text.strip()
+
+        summary = detail.find(id='layer_sy').text.strip() if hasattr(detail.find(id='layer_sy'), 'text') \
+            else detail.find('dd', class_='intro _multiLayerContainer').text.strip()
+        genre = soup_genre.select_one('.v').text if hasattr(soup_genre.select_one('.v'), 'text') else '드라마'
+        rating = float(detail.select_one('.fred').text.replace('%', '')) \
+            if hasattr(detail.select_one('.fred'), 'text') else 0.0
+        # poster_url = ''
+        # broadcasting_day = models.CharField(max_length=10)
+        # broadcasting_start_time = models.TimeField()
+        # broadcasting_end_time = models.TimeField()
         broadcasting_station = detail.find('dd').find('span').find('a').text
-        is_broadcasiting = detail.find('dd').find('span').select_one('.broad_txt').text
+        is_broadcasiting = True if detail.find('dd').find('span').select_one('.broad_txt').text == '방영중' else False
 
-        try:
-            rating = detail.select_one('.fred').text
-        except AttributeError:
-            rating = '알수없음'
-
-        try:
-            genre = soup_genre.select_one('.v').text
-        except AttributeError:
-            genre = '드라마'
-
-        return {'rating': rating, 'summary': summary, 'genre': genre, 'broadcasting_station': broadcasting_station,
+        return {'title': keyword, 'rating': rating, 'summary': summary, 'genre': genre,
+                'broadcasting_station': broadcasting_station,
                 'is_broadcasiting': is_broadcasiting}
 
 
-if __name__ == "__main__":
+def create_drama():
     crawler = Crawler()
-
     live_drama_list = crawler.get_live_drama_list()
     for drama in live_drama_list:
-        print(drama)
         print(crawler.get_detail_in_naver(drama))
+
+
+def update_drama(drama):
+    crawler = Crawler()
+    crawler.get_detail_in_naver(drama)
+
+
+if __name__ == "__main__":
+    create_drama()
