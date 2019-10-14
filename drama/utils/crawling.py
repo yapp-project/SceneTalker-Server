@@ -88,7 +88,7 @@ class Crawler:
         print(datetime_info[:-9])
         broadcasting_day = ''
         time_info = datetime_info.split(') ')[1]
-        broadcasting_start_time = datetime.strptime(time_info[3:], "%H:%M") if time_info == '오전' \
+        broadcasting_start_time = datetime.strptime(time_info[3:], "%H:%M") if time_info[:2] == '오전' \
             else datetime.strptime(f'{int(time_info[3:5]) + 12}{time_info[5:]}', "%H:%M")
         broadcasting_end_time = broadcasting_start_time + timedelta(hours=1, minutes=20)
 
