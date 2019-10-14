@@ -80,17 +80,16 @@ class NaverCrawler:
             else detail.find('dd', class_='intro _multiLayerContainer').text.strip()
         rating = float(detail.select_one('.fred').text.replace('%', '')) if hasattr(detail.select_one('.fred'), 'text') \
             else 0.0
-        broadcasting_station = detail.find('dd').find('span').find('a').text
-        is_broadcasiting = True if detail.find('dd').find('span').select_one('.broad_txt').text == '방영중' else False
         poster_url = soup.select_one('.brcs_thumb').find('img').attrs['src']
 
         datetime_info = detail.find('span', class_='inline').text.split('|')[1].strip().split(' [')[0]
-        print(datetime_info[:-9])
-        broadcasting_day = ''
         time_info = datetime_info.split(') ')[1]
+        broadcasting_day = parse_day(datetime_info[:-9])
+        broadcasting_station = detail.find('dd').find('span').find('a').text
         broadcasting_start_time = datetime.strptime(time_info[3:], "%H:%M") if time_info[:2] == '오전' \
             else datetime.strptime(f'{int(time_info[3:5]) + 12}{time_info[5:]}', "%H:%M")
         broadcasting_end_time = broadcasting_start_time + timedelta(hours=1, minutes=20)
+        is_broadcasiting = True if detail.find('dd').find('span').select_one('.broad_txt').text == '방영중' else False
 
         return {'title': keyword,
                 'rating': rating,
@@ -109,6 +108,21 @@ class NaverCrawler:
         return genre
 
 
+def parse_day(day):
+    days = ['월', '화', '수', '목', '금']
+    day = day[1:-1]
+    result = []
+    if '~' in day:
+        for i in days[days.index(day[0]): days.index(day[2]) + 1]:
+            result.append(i)
+    elif ',' in day:
+        for i in day.replace(' ', '').split(','):
+            result.append(i)
+    else:
+        result.append(day)
+    return result
+
+
 def update_drama():
     crawler = NaverCrawler()
     qs = Drama.objects.filter(is_broadcasiting=True)
@@ -120,6 +134,17 @@ def update_drama():
 
     for live_drama in crawler.get_live_drama_list():
         if live_drama not in title_list:
-            drama = Drama.objects.create(**crawler.get_detail(live_drama))
+            detail = crawler.get_detail(live_drama)
+            drama = Drama.objects.create(title=detail['title'],
+                                         rating=detail['rating'],
+                                         summary=detail['summary'],
+                                         broadcasting_station=detail['broadcasting_station'],
+                                         is_broadcasiting=detail['is_broadcasiting'],
+                                         broadcasting_start_time=detail['broadcasting_start_time'],
+                                         broadcasting_end_time=detail['broadcasting_end_time'],
+                                         poster_url=detail['poster_url'])
+            for day in detail['broadcasting_day']:
+                drama.broadcasting_day.add(day)
+
             for genre in crawler.get_genre(live_drama).replace(' ', '').split(','):
                 drama.genre.add(genre)

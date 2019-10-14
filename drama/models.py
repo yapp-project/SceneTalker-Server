@@ -1,15 +1,24 @@
 from django.db import models
 from taggit.managers import TaggableManager
+from taggit.models import TaggedItemBase
 from rest_framework import serializers
+
+
+class TaggedGenre(TaggedItemBase):
+    content_object = models.ForeignKey('Drama', on_delete=models.CASCADE)
+
+
+class TaggedBroadCastingDay(TaggedItemBase):
+    content_object = models.ForeignKey('Drama', on_delete=models.CASCADE)
 
 
 class Drama(models.Model):
     title = models.CharField(max_length=50)
     summary = models.TextField()
-    genre = TaggableManager()
+    genre = TaggableManager(through=TaggedGenre, related_name='genre')
     rating = models.DecimalField(max_digits=3, decimal_places=1)
     poster_url = models.URLField(max_length=250)
-    broadcasting_day = models.CharField(max_length=10)
+    broadcasting_day = TaggableManager(through=TaggedBroadCastingDay, related_name='broadcasting_day')
     broadcasting_start_time = models.TimeField()
     broadcasting_end_time = models.TimeField()
     broadcasting_station = models.CharField(max_length=20)
@@ -21,8 +30,8 @@ class Drama(models.Model):
         ordering = ["-rating"]
 
     def __str__(self):
-        return '이름: {}, 평점: {}, 방영일: {}, 방영시간: {} ~ {}'.format(self.title, self.rating, self.broadcasting_day,
-                                                               self.broadcasting_start_time, self.broadcasting_end_time)
+        return '이름: {}, 평점: {}, 방영시간: {} ~ {}'.format(self.title, self.rating, self.broadcasting_start_time,
+                                                      self.broadcasting_end_time)
 
 
 class DramaSerializer(serializers.ModelSerializer):
