@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -27,20 +26,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
     'channels',
     'channels_redis',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -48,7 +44,7 @@ INSTALLED_APPS = [
     'rest_auth',
     'rest_framework',
     'rest_framework.authtoken',
-
+    'django_filters',
     'user',
     'chat',
     'drama',
@@ -85,7 +81,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'SceneTalker.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
@@ -95,7 +90,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -130,7 +124,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
@@ -159,3 +152,8 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+CRONJOBS = [
+    ('0 6,18 * * *', 'drama.utils.crawling.update_drama', '>> 로그남길장소'),
+]
+CRONTAB_LOCK_JOBS = True
