@@ -14,8 +14,3 @@ class DramaListCreateView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         update_drama()
         return Response()
-
-
-class DramaRetrieveUpdate(generics.RetrieveUpdateAPIView):
-    queryset = Drama.objects.all()
-    serializer_class = DramaSerializer
