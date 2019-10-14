@@ -85,10 +85,10 @@ class NaverCrawler:
         datetime_info = detail.find('span', class_='inline').text.split('|')[1].strip().split(' [')[0]
         time_info = datetime_info.split(') ')[1]
         broadcasting_day = parse_day(datetime_info[:-9])
-        broadcasting_station = detail.find('dd').find('span').find('a').text
         broadcasting_start_time = datetime.strptime(time_info[3:], "%H:%M") if time_info[:2] == '오전' \
             else datetime.strptime(f'{int(time_info[3:5]) + 12}{time_info[5:]}', "%H:%M")
-        broadcasting_end_time = broadcasting_start_time + timedelta(hours=1, minutes=20)
+        broadcasting_end_time = broadcasting_start_time + timedelta(hours=1, minutes=30)
+        broadcasting_station = detail.find('dd').find('span').find('a').text
         is_broadcasiting = True if detail.find('dd').find('span').select_one('.broad_txt').text == '방영중' else False
 
         return {'title': keyword,
