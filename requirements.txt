@@ -18,6 +18,7 @@ defusedxml==0.6.0
 Django==2.2.6
 django-allauth==0.40.0
 django-crontab==0.7.1
+django-filter==2.0.0
 django-taggit==1.1.0
 django-rest-auth==0.9.5
 djangorestframework==3.10.3
