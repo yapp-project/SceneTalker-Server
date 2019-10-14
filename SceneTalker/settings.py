@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
+    'django_crontab',
     'user',
     'chat',
     'drama',
@@ -154,6 +155,6 @@ CHANNEL_LAYERS = {
 }
 
 CRONJOBS = [
-    ('0 6,18 * * *', 'drama.utils.crawling.update_drama', '>> 로그남길장소'),
+    ('0 6,18 * * *', 'drama.utils.crawler.update_drama', '>> 로그남길장소'),
 ]
 CRONTAB_LOCK_JOBS = True

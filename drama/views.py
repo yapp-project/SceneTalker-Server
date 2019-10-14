@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Drama, DramaSerializer
-from .utils.crawling import update_drama
+from .utils.crawler import update_drama
 
 
 class DramaListCreateView(generics.ListAPIView):

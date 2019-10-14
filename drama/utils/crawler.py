@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import requests
 
 
-class Crawler:
+class NaverCrawler:
     @staticmethod
     def search_keyword(keyword):
         headers = {
@@ -69,7 +69,7 @@ class Crawler:
 
         return drama_list
 
-    def get_detail_in_naver(self, keyword):
+    def get_detail(self, keyword):
         html = self.search_keyword(keyword)
         soup = bs(html, 'html.parser')
 
@@ -102,7 +102,7 @@ class Crawler:
                 'broadcasting_day': broadcasting_day,
                 'poster_url': poster_url}
 
-    def get_genre_in_naver(self, keyword):
+    def get_genre(self, keyword):
         html_for_genre = self.search_keyword(f'{keyword} 장르')
         soup = bs(html_for_genre, 'html.parser')
         genre = soup.select_one('.v').text if hasattr(soup.select_one('.v'), 'text') else '드라마'
@@ -110,16 +110,16 @@ class Crawler:
 
 
 def update_drama():
-    crawler = Crawler()
+    crawler = NaverCrawler()
     qs = Drama.objects.filter(is_broadcasiting=True)
     title_list = [drama.title for drama in qs]
 
     for title in title_list:
-        detail = crawler.get_detail_in_naver(title)
+        detail = crawler.get_detail(title)
         Drama.objects.filter(title=title).update(rating=detail['rating'], is_broadcasiting=detail['is_broadcasiting'])
 
     for live_drama in crawler.get_live_drama_list():
         if live_drama not in title_list:
-            drama = Drama.objects.create(**crawler.get_detail_in_naver(live_drama))
-            for genre in crawler.get_genre_in_naver(live_drama).replace(' ', '').split(','):
+            drama = Drama.objects.create(**crawler.get_detail(live_drama))
+            for genre in crawler.get_genre(live_drama).replace(' ', '').split(','):
                 drama.genre.add(genre)
