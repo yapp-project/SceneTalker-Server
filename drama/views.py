@@ -5,7 +5,7 @@ from .models import Drama, DramaSerializer
 from datetime import datetime
 
 
-class DramaListCreateView(generics.ListAPIView):
+class DramaListView(generics.ListAPIView):
     queryset = Drama.objects.all()
     serializer_class = DramaSerializer
 
@@ -20,11 +20,9 @@ class DramaListCreateView(generics.ListAPIView):
             queryset = Drama.objects.filter(is_broadcasiting=True,
                                             broadcasting_day__name__in=[days_of_week[datetime.today().weekday()]],
                                             broadcasting_start_time__lte=datetime.now(),
-                                            broadcasting_end_time__gte=datetime.now()).prefetch_related(
-                'broadcasting_day').prefetch_related('genre')
+                                            broadcasting_end_time__gte=datetime.now())
         else:
-            queryset = Drama.objects.filter(is_broadcasiting=True).prefetch_related(
-                'broadcasting_day').prefetch_related('genre')
+            queryset = Drama.objects.filter(is_broadcasiting=True)
 
         page = self.paginate_queryset(queryset)
         if page is not None:

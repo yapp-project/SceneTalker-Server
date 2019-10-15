@@ -1,6 +1,7 @@
 from django.db import models
 from taggit.managers import TaggableManager
 from taggit.models import TaggedItemBase
+from taggit_serializer.serializers import (TagListSerializerField, TaggitSerializer)
 from rest_framework import serializers
 
 
@@ -34,7 +35,24 @@ class Drama(models.Model):
                                                       self.broadcasting_end_time)
 
 
-class DramaSerializer(serializers.ModelSerializer):
+class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):
+    broadcasting_day = TagListSerializerField()
+    genre = TagListSerializerField()
+
     class Meta:
         model = Drama
-        fields = '__all__'
+        fields = (
+            'id',
+            'title',
+            'summary',
+            'genre',
+            'rating',
+            'poster_url',
+            'broadcasting_day',
+            'broadcasting_start_time',
+            'broadcasting_end_time',
+            'broadcasting_station',
+            'is_broadcasiting',
+            'created_at',
+            'updated_at'
+        )

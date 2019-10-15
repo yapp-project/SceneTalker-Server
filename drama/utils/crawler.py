@@ -1,6 +1,8 @@
 from drama.models import Drama
 from bs4 import BeautifulSoup as bs
 from datetime import datetime, timedelta
+from time import sleep
+from random import randint
 import requests
 
 
@@ -70,6 +72,7 @@ class NaverCrawler:
         return drama_list
 
     def get_detail(self, keyword):
+        sleep(randint(1, 3))
         html = self.search_keyword(keyword)
         soup = bs(html, 'html.parser')
 
@@ -85,8 +88,8 @@ class NaverCrawler:
         datetime_info = detail.find('span', class_='inline').text.split('|')[1].strip().split(' [')[0]
         time_info = datetime_info.split(') ')[1]
         broadcasting_day = parse_day(datetime_info[:-9])
-        broadcasting_start_time = datetime.strptime(time_info[3:], "%H:%M") if time_info[:2] == '오전' \
-            else datetime.strptime(f'{int(time_info[3:5]) + 12}{time_info[5:]}', "%H:%M")
+        broadcasting_start_time = datetime.strptime(time_info[3:], "%H:%M") - timedelta(minutes=10) if time_info[:2] == '오전' \
+            else datetime.strptime(f'{int(time_info[3:5]) + 12}{time_info[5:]}', "%H:%M") - timedelta(minutes=10)
         broadcasting_end_time = broadcasting_start_time + timedelta(hours=1, minutes=30)
         broadcasting_station = detail.find('dd').find('span').find('a').text
         is_broadcasiting = True if detail.find('dd').find('span').select_one('.broad_txt').text == '방영중' else False
