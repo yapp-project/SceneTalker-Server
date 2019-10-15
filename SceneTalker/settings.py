@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'user',
     'chat',
     'drama',
+    'feed',
     'taggit',
 ]
 

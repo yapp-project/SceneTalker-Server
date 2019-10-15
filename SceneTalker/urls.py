@@ -10,5 +10,6 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('user/', include('user.urls')),
     path('chat/', include('chat.urls')),
-    path('drama/', include('drama.urls'))
+    path('drama/', include('drama.urls')),
+    path('feed/', include('feed.urls')),
 ]
