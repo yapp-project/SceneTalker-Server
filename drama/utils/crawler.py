@@ -9,20 +9,7 @@ import requests
 class NaverCrawler:
     @staticmethod
     def search_keyword(keyword):
-        headers = {
-            'authority': 'search.naver.com',
-            'upgrade-insecure-requests': '1',
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36',
-            'sec-fetch-mode': 'navigate',
-            'sec-fetch-user': '?1',
-            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-            'sec-fetch-site': 'same-origin',
-            'referer': 'https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query=%EB%B0%B0%EA%B0%80%EB%B3%B8%EB%93%9C',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-            'cookie': 'NNB=P5SLKNMWRQ4F2; nx_open_so=1; ASID=7db134b80000016cc3de939f0000005e; _ga_4BKHBFKFK0=GS1.1.1568988287.1.1.1568989819.60; nx_ssl=2; _ga=GA1.2.1718670836.1568988288; BMR=s=1570176040457&r=https%3A%2F%2Fm.blog.naver.com%2FPostView.nhn%3FblogId%3Dhsetsh%26logNo%3D221166630296%26proxyReferer%3Dhttps%253A%252F%252Fwww.google.com%252F&r2=https%3A%2F%2Fwww.google.com%2F; page_uid=UiEUCsprvh8ssMe+mBKssssstb8-461137; _naver_usersession_=qLyt7RAkfpVyH9nVoCmWjg==',
-        }
-
+        sleep(randint(0, 2))
         params = (
             ('sm', 'tab_hty.top'),
             ('where', 'nexearch'),
@@ -31,7 +18,7 @@ class NaverCrawler:
             ('tqi', 'UiEUCsprvh8ssMe+mBKssssstb8-461137'),
         )
 
-        response = requests.get('https://search.naver.com/search.naver', headers=headers, params=params)
+        response = requests.get('https://search.naver.com/search.naver', params=params)
         assert response.ok, response.reason
         return response.text
 
@@ -72,27 +59,67 @@ class NaverCrawler:
         return drama_list
 
     def get_detail(self, keyword):
-        sleep(randint(1, 3))
         html = self.search_keyword(keyword)
         soup = bs(html, 'html.parser')
 
         detail = soup.find(id='brcs_detail')
-        if not detail:
+        if detail is None:
             return None
-        summary = detail.find(id='layer_sy').text.strip() if hasattr(detail.find(id='layer_sy'), 'text') \
-            else detail.find('dd', class_='intro _multiLayerContainer').text.strip()
-        rating = float(detail.select_one('.fred').text.replace('%', '')) if hasattr(detail.select_one('.fred'), 'text') \
-            else 0.0
-        poster_url = soup.select_one('.brcs_thumb').find('img').attrs['src']
 
-        datetime_info = detail.find('span', class_='inline').text.split('|')[1].strip().split(' [')[0]
-        time_info = datetime_info.split(') ')[1]
-        broadcasting_day = parse_day(datetime_info[:-9])
-        broadcasting_start_time = datetime.strptime(time_info[3:], "%H:%M") - timedelta(minutes=10) if time_info[:2] == '오전' \
-            else datetime.strptime(f'{int(time_info[3:5]) + 12}{time_info[5:]}', "%H:%M") - timedelta(minutes=10)
-        broadcasting_end_time = broadcasting_start_time + timedelta(hours=1, minutes=30)
-        broadcasting_station = detail.find('dd').find('span').find('a').text
-        is_broadcasiting = True if detail.find('dd').find('span').select_one('.broad_txt').text == '방영중' else False
+        if hasattr(detail.find(id='layer_sy'), 'text'):
+            summary = detail.find(id='layer_sy').text.strip()
+        else:
+            if hasattr(detail.find('dd', class_='intro _multiLayerContainer'), 'text'):
+                summary = detail.find('dd', class_='intro _multiLayerContainer').text.strip()
+            else:
+                summary = '알수없음'
+
+        if hasattr(detail.select_one('.fred'), 'text'):
+            rating = float(detail.select_one('.fred').text.replace('%', ''))
+        else:
+            rating = 0.0
+
+        if detail.find('dd') and detail.find('dd').find('span') and detail.find('dd').find('span').select_one(
+                '.broad_txt') and hasattr(detail.find('dd').find('span').select_one('.broad_txt'), 'text'):
+            if detail.find('dd').find('span').select_one('.broad_txt').text == '방영중':
+                is_broadcasiting = True
+            else:
+                is_broadcasiting = False
+        else:
+            is_broadcasiting = False
+
+        if detail.find('dd') and detail.find('dd').find('span') and detail.find('dd').find('span').find(
+                'a') and hasattr(detail.find('dd').find('span').find('a'), 'text'):
+            broadcasting_station = detail.find('dd').find('span').find('a').text
+        else:
+            broadcasting_station = '알수없음'
+
+        if soup.select_one('.brcs_thumb') and soup.select_one('.brcs_thumb').find('img'):
+            if 'src' in soup.select_one('.brcs_thumb').find('img').attrs.keys():
+                poster_url = soup.select_one('.brcs_thumb').find('img').attrs['src']
+            else:
+                poster_url = 'https://webhostingmedia.net/wp-content/uploads/2018/01/http-error-404-not-found.png'
+        else:
+            poster_url = 'https://webhostingmedia.net/wp-content/uploads/2018/01/http-error-404-not-found.png'
+
+        if soup.find('div', class_='brcs_newest btm top_line') and soup.find('div', class_='brcs_newest btm top_line'). \
+                find('a') and hasattr(soup.find('div', class_='brcs_newest btm top_line').find('a'), 'text'):
+            episode = soup.find('div', class_='brcs_newest btm top_line').find('a').text
+        else:
+            episode = '알수없음'
+
+        try:
+            datetime_info = detail.find('span', class_='inline').text.split('|')[1].strip().split(' [')[0]
+            broadcasting_day = parse_day(datetime_info[:-9])
+            time_info = datetime_info.split(') ')[1]
+            if time_info[:2] == '오전':
+                broadcasting_start_time = datetime.strptime(time_info[3:], "%H:%M") - timedelta(minutes=10)
+            else:
+                broadcasting_start_time = datetime.strptime(f'{int(time_info[3:5]) + 12}{time_info[5:]}', "%H:%M") - \
+                                          timedelta(minutes=10)
+            broadcasting_end_time = broadcasting_start_time + timedelta(hours=1, minutes=30)
+        except Exception:
+            return None
 
         return {'title': keyword,
                 'rating': rating,
@@ -102,7 +129,8 @@ class NaverCrawler:
                 'broadcasting_start_time': broadcasting_start_time,
                 'broadcasting_end_time': broadcasting_end_time,
                 'broadcasting_day': broadcasting_day,
-                'poster_url': poster_url}
+                'poster_url': poster_url,
+                'episode': episode}
 
     def get_genre(self, keyword):
         html_for_genre = self.search_keyword(f'{keyword} 장르')
@@ -133,21 +161,31 @@ def update_drama():
 
     for title in title_list:
         detail = crawler.get_detail(title)
-        Drama.objects.filter(title=title).update(rating=detail['rating'], is_broadcasiting=detail['is_broadcasiting'])
+        if detail:
+            Drama.objects.filter(title=title).update(rating=detail['rating'],
+                                                     is_broadcasiting=detail['is_broadcasiting'])
+        else:
+            Drama.objects.filter(title=title).update(is_broadcasiting=False)
 
     for live_drama in crawler.get_live_drama_list():
         if live_drama not in title_list:
             detail = crawler.get_detail(live_drama)
-            drama = Drama.objects.create(title=detail['title'],
-                                         rating=detail['rating'],
-                                         summary=detail['summary'],
-                                         broadcasting_station=detail['broadcasting_station'],
-                                         is_broadcasiting=detail['is_broadcasiting'],
-                                         broadcasting_start_time=detail['broadcasting_start_time'],
-                                         broadcasting_end_time=detail['broadcasting_end_time'],
-                                         poster_url=detail['poster_url'])
-            for day in detail['broadcasting_day']:
-                drama.broadcasting_day.add(day)
+            if detail:
+                drama = Drama.objects.create(title=detail['title'],
+                                             rating=detail['rating'],
+                                             summary=detail['summary'],
+                                             broadcasting_station=detail['broadcasting_station'],
+                                             is_broadcasiting=detail['is_broadcasiting'],
+                                             broadcasting_start_time=detail['broadcasting_start_time'],
+                                             broadcasting_end_time=detail['broadcasting_end_time'],
+                                             poster_url=detail['poster_url'],
+                                             episode=detail['episode'])
+                for day in detail['broadcasting_day']:
+                    drama.broadcasting_day.add(day)
 
-            for genre in crawler.get_genre(live_drama).replace(' ', '').split(','):
-                drama.genre.add(genre)
+                for genre in crawler.get_genre(live_drama).replace(' ', '').split(','):
+                    drama.genre.add(genre)
+
+
+if __name__ == "__main__":
+    update_drama()
