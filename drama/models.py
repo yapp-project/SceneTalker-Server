@@ -32,8 +32,9 @@ class Drama(models.Model):
         ordering = ["-rating"]
 
     def __str__(self):
-        return '이름: {}, 평점: {}, 방영시간: {} ~ {}'.format(self.title, self.rating, self.broadcasting_start_time,
-                                                      self.broadcasting_end_time)
+        return '제목: {}, 시청률: {}, 방영요일: {}, 방영시간: {} ~ {}'.format(self.title, self.rating, self.broadcasting_day,
+                                                                 self.broadcasting_start_time,
+                                                                 self.broadcasting_end_time)
 
 
 class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):

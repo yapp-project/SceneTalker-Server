@@ -1,6 +1,5 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
 from .models import Drama, DramaSerializer
 from datetime import datetime
 
@@ -8,10 +7,6 @@ from datetime import datetime
 class DramaListView(generics.ListAPIView):
     queryset = Drama.objects.all()
     serializer_class = DramaSerializer
-
-    # 필드로 필터링할 때 사용하는데 on-air 인지 아닌지만 판단하기때문에 필드로 판단 불가해서 사용하지 않을듯
-    filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('is_broadcasiting',)
 
     def get(self, request, *args, **kwargs):
         query_params = request.query_params.get('onair')

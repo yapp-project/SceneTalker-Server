@@ -74,51 +74,45 @@ class NaverCrawler:
             else:
                 summary = '알수없음'
 
-        if hasattr(detail.select_one('.fred'), 'text'):
+        try:
             rating = float(detail.select_one('.fred').text.replace('%', ''))
-        else:
+        except AttributeError:
             rating = 0.0
 
-        if detail.find('dd') and detail.find('dd').find('span') and detail.find('dd').find('span').select_one(
-                '.broad_txt') and hasattr(detail.find('dd').find('span').select_one('.broad_txt'), 'text'):
+        try:
             if detail.find('dd').find('span').select_one('.broad_txt').text == '방영중':
                 is_broadcasiting = True
             else:
                 is_broadcasiting = False
-        else:
+        except AttributeError:
             is_broadcasiting = False
 
-        if detail.find('dd') and detail.find('dd').find('span') and detail.find('dd').find('span').find(
-                'a') and hasattr(detail.find('dd').find('span').find('a'), 'text'):
+        try:
             broadcasting_station = detail.find('dd').find('span').find('a').text
-        else:
+        except AttributeError:
             broadcasting_station = '알수없음'
 
-        if soup.select_one('.brcs_thumb') and soup.select_one('.brcs_thumb').find('img'):
-            if 'src' in soup.select_one('.brcs_thumb').find('img').attrs.keys():
-                poster_url = soup.select_one('.brcs_thumb').find('img').attrs['src']
-            else:
-                poster_url = 'https://webhostingmedia.net/wp-content/uploads/2018/01/http-error-404-not-found.png'
-        else:
+        try:
+            poster_url = soup.select_one('.brcs_thumb').find('img').attrs['src']
+        except AttributeError:
             poster_url = 'https://webhostingmedia.net/wp-content/uploads/2018/01/http-error-404-not-found.png'
 
-        if soup.find('div', class_='brcs_newest btm top_line') and soup.find('div', class_='brcs_newest btm top_line'). \
-                find('a') and hasattr(soup.find('div', class_='brcs_newest btm top_line').find('a'), 'text'):
+        try:
             episode = soup.find('div', class_='brcs_newest btm top_line').find('a').text
-        else:
+        except AttributeError:
             episode = '알수없음'
 
         try:
             datetime_info = detail.find('span', class_='inline').text.split('|')[1].strip().split(' [')[0]
-            broadcasting_day = parse_day(datetime_info[:-9])
+            broadcasting_day = parse_day(datetime_info[:-9][1:-1])
             time_info = datetime_info.split(') ')[1]
             if time_info[:2] == '오전':
                 broadcasting_start_time = datetime.strptime(time_info[3:], "%H:%M") - timedelta(minutes=10)
             else:
-                broadcasting_start_time = datetime.strptime(f'{int(time_info[3:5]) + 12}{time_info[5:]}', "%H:%M") - \
-                                          timedelta(minutes=10)
+                broadcasting_start_time = datetime.strptime(f'{int(time_info[3:5]) + 12}{time_info[5:]}',
+                                                            "%H:%M") - timedelta(minutes=10)
             broadcasting_end_time = broadcasting_start_time + timedelta(hours=1, minutes=30)
-        except Exception:
+        except AttributeError:
             return None
 
         return {'title': keyword,
@@ -135,16 +129,20 @@ class NaverCrawler:
     def get_genre(self, keyword):
         html_for_genre = self.search_keyword(f'{keyword} 장르')
         soup = bs(html_for_genre, 'html.parser')
-        genre = soup.select_one('.v').text if hasattr(soup.select_one('.v'), 'text') else '드라마'
+        try:
+            genre = soup.select_one('.v').text
+        except AttributeError:
+            genre = '드라마'
+
         return genre
 
 
 def parse_day(day):
-    days = ['월', '화', '수', '목', '금']
-    day = day[1:-1]
+    days = ['월', '화', '수', '목', '금', '토', '일']
     result = []
     if '~' in day:
-        for i in days[days.index(day[0]): days.index(day[2]) + 1]:
+        day_range = day.split('~')
+        for i in days[days.index(day_range[0]): days.index(day_range[1]) + 1]:
             result.append(i)
     elif ',' in day:
         for i in day.replace(' ', '').split(','):
