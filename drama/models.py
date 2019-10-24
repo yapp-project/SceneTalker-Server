@@ -36,8 +36,10 @@ class Drama(models.Model):
 
 
 class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):
+    from feed.models import FeedSerializer
     broadcasting_day = TagListSerializerField()
     genre = TagListSerializerField()
+    feed = FeedSerializer(read_only=True)
 
     class Meta:
         model = Drama
@@ -55,5 +57,6 @@ class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):
             'is_broadcasiting',
             'episode',
             'created_at',
-            'updated_at'
+            'updated_at',
+            'feed'
         )
