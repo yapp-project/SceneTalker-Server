@@ -1,4 +1,5 @@
 from drama.models import Drama
+from feed.models import Feed
 from bs4 import BeautifulSoup as bs
 from datetime import datetime, timedelta
 from time import sleep
@@ -183,6 +184,9 @@ def update_drama():
 
                 for genre in crawler.get_genre(live_drama).replace(' ', '').split(','):
                     drama.genre.add(genre)
+
+                # one to one feed 모델 생성
+                Feed.objects.create(drama=drama)
 
 
 if __name__ == "__main__":
