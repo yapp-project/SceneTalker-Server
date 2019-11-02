@@ -44,6 +44,8 @@
     </div><br/>
     <input id="chat-message-input" type="text" size="100"/><br/>
     <input id="chat-message-submit" type="button" value="Send"/><br>
+    <input id="soda-button" type="button" value="soda"/><span id="soda-count">0</span><br>
+    <input id="potato-button" type="button" value="potato"/><span id="soda-count">0</span><br>
 </body>
 
 <script>
@@ -64,17 +66,33 @@
         var data = JSON.parse(e.data);
         var message = data['message'];
         var sender = data['sender'];
+        console.log(data);
         console.log(message, sender, currentUserName);
-        // document.querySelector('#chat-log').value += (message + '\n');
-        chat_count += 1;
-        if(sender == currentUserName){
-            $("#chat-log").append('<div class="my_message">' + currentUserName + " : " + chat_count + '<br></div>');
-        }
-        else {
-            $("#chat-log").append('<div class="other_message">' + sender + " : " + chat_count + '<br></div>');
-        }
+        if(sender === 'AdminServer'){
+            var kind = data['kind'];
+            console.log(kind);
+            if(kind === 'soda'){
+                var soda_count = parseInt($("#soda-count").html());
+                console.log(soda_count);
+                soda_count += 1;
+                $("#soda-count").html(soda_count);
+            }
+            else if(kind == 'potato'){
 
-        $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
+            }
+        }
+        else{
+            // document.querySelector('#chat-log').value += (message + '\n');
+            chat_count += 1;
+            if(sender == currentUserName){
+                $("#chat-log").append('<div class="my_message">' + currentUserName + " : " + chat_count + '<br></div>');
+            }
+            else {
+                $("#chat-log").append('<div class="other_message">' + sender + " : " + chat_count + '<br></div>');
+            }
+
+            $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
+        }
     };
 
     chatSocket.onclose = function(e) {
@@ -92,10 +110,27 @@
         var messageInputDom = document.querySelector('#chat-message-input');
         var message = messageInputDom.value;
         chatSocket.send(JSON.stringify({
+            'type' : 'chat_message',
             'message': message
         }));
 
         messageInputDom.value = '';
+    };
+
+    document.querySelector('#soda-button').onclick = function(e) {
+        chatSocket.send(JSON.stringify({
+            'type' : 'count',
+            'kind' : 'soda',
+            'count': 1
+        }));
+    };
+
+    document.querySelector('#potato-button').onclick = function(e) {
+        chatSocket.send(JSON.stringify({
+            'type' : 'count',
+            'kind' : 'potato',
+            'count': 1
+        }));
     };
 </script>
 
