@@ -5,6 +5,32 @@ from datetime import datetime
 
 
 class DramaListView(generics.ListAPIView):
+    """
+        방영중인 드라마 리스트를 불러오는 API
+
+        ---
+        # Query Params
+            - onair : Array[true, false]
+            - page : Integer
+        # Response
+            - id : 드라마 id
+            - title : 드라마 제목
+            - summary : 줄거리
+            - genre : 장르
+            - rating : 평점
+            - poster_url : 포스터 url
+            - broadcasting_day : 방송요일
+            - broadcasting_start_time : 방송 시작시간
+            - broadcasting_end_time : 방송 종료시간
+            - broadcasting_station : 방송국
+            - is_broadcasiting : 방영중 여부
+            - episode : 부
+            - created_at : 생성시간
+            - updated_at : 수정시간
+            - feed : 피드정보
+                - id : 피드 id
+                - drama : 드라마 id
+    """
     queryset = Drama.objects.all()
     serializer_class = DramaSerializer
 
