@@ -1,4 +1,5 @@
 from .models import Post, Comment, PostSerializer, CommentSerializer, Feed
+from django.http import JsonResponse
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -15,6 +16,8 @@ class PostListCreateAPIView(APIView):
                 - feed_id : 피드 id
             # Response
                 - id : 게시물 id
+                - is_mine : 사용자가 작성했는지 여부
+                - is_liked_by_me : 사용자가 좋아요를 눌렀는지 여부
                 - content : 게시물 내용
                 - image : image url
                 - created_at : 작성시간
@@ -23,7 +26,7 @@ class PostListCreateAPIView(APIView):
                 - author : 작성자 id
         """
         posts = Feed.objects.prefetch_related('post_set').get(id=feed_id).post_set.all()
-        serializer = PostSerializer(posts, many=True)
+        serializer = PostSerializer(posts, context={'request': request}, many=True)
         return Response(serializer.data)
 
     def post(self, request, feed_id):
@@ -34,11 +37,12 @@ class PostListCreateAPIView(APIView):
             # Path Params
                 - feed : 피드 id
             # Body
-                - author : 작성자 id(Required)
                 - content : 게시물 내용(Required)
                 - image : image 객체
             # Response
                 - id : 게시물 id
+                - is_mine : 사용자가 작성했는지 여부
+                - is_liked_by_me : 사용자가 좋아요를 눌렀는지 여부
                 - content : 게시물 내용
                 - image : image url
                 - created_at : 작성시간
@@ -47,7 +51,8 @@ class PostListCreateAPIView(APIView):
                 - author : 작성자 id
         """
         request.data['feed'] = feed_id
-        serializer = PostSerializer(data=request.data)
+        request.data['author'] = request.user.id
+        serializer = PostSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -68,36 +73,18 @@ class PostRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 
 def like_post(request, feed_id, post_id):
-    # """
-    #     게시물 좋아요 API
-    #
-    #     ---
-    #     # Path Params
-    #         - feed_id : 피드 id
-    #         - post_id : 게시물 id
-    # """
-    # try:
-    #     post = Post.objects.get(id=post_id)
-    #     # request.user.username = post.author.username
-    #     # request.user = post.author
-    #     print(post.likes.name)
-    #     print(post.like_count)
-    #     if post:
-    #         # if post.likes.filter(username=request.user.username).exists:
-    #         #     print(post.likes)
-    #         #     print(request.user.username)
-    #         #     print('hi')
-    #         #     post.likes.remove(request.user)
-    #         # else:
-    #         #     print('bye')
-    #         #     post.likes.add(request.user)
-    #         # post.likes.remove(request.user)
-    #         # post.likes.add(request.user)
-    #         return Response()
-    #     return Response(status=status.HTTP_404_NOT_FOUND)
-    # except:
-    #     return Response()
-    pass
+    if request.method == 'POST':
+        try:
+            post = Post.objects.get(id=post_id)
+            print(post.likes)
+            # if post.likes.filter(username=request.user.username).exists:
+            #     post.likes.remove(request.user)
+            # else:
+            #     post.likes.add(request.user)
+
+            return JsonResponse({'status_code': '200'})
+        except:
+            return JsonResponse({'status_code': '200'})
 
 
 class CommentListCreateAPIView(APIView):
@@ -110,15 +97,18 @@ class CommentListCreateAPIView(APIView):
                 - feed_id : 피드 id
                 - post_id : 게시물 id
             # Response
-                - id : 댓글 id,
-                - content : 댓글 내용,
-                - created_at : 작성시간,
-                - updated_at : 수정시간,
-                - post : 게시물 id,
+                - id : 댓글 id
+                - is_mine : 사용자가 작성했는지 여부
+                - is_liked_by_me : 사용자가 좋아요를 눌렀는지 여부
+                - like_counts : 좋아요 개수
+                - content : 댓글 내용
+                - created_at : 작성시간
+                - updated_at : 수정시간
+                - post : 게시물 id
                 - author : 작성자 id
         """
         comments = Post.objects.prefetch_related('comment_set').get(id=post_id).comment_set.all()
-        serializer = CommentSerializer(comments, many=True)
+        serializer = CommentSerializer(comments, context={'request': request}, many=True)
         return Response(serializer.data)
 
     def post(self, request, feed_id, post_id):
@@ -130,10 +120,11 @@ class CommentListCreateAPIView(APIView):
                 - feed_id : 피드 id
                 - post_id : 게시물 id
             # Body
-                - author : 작성자 id(Required)
                 - content : 댓글 내용(Required)
             # Response
                 - id : 댓글 id,
+                - is_mine : 사용자가 작성했는지 여부
+                - is_liked_by_me : 사용자가 좋아요를 눌렀는지 여부
                 - content : 댓글 내용,
                 - created_at : 작성시간,
                 - updated_at : 수정시간,
@@ -141,7 +132,8 @@ class CommentListCreateAPIView(APIView):
                 - author : 작성자 id
         """
         request.data['post'] = post_id
-        serializer = CommentSerializer(data=request.data)
+        request.data['author'] = request.user.id
+        serializer = CommentSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

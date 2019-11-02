@@ -170,7 +170,7 @@ def update_drama():
                                              rating=detail['rating'],
                                              summary=detail['summary'],
                                              broadcasting_station=detail['broadcasting_station'],
-                                             is_broadcasting=detail['is_broadcasiting'],
+                                             is_broadcasting=detail['is_broadcasting'],
                                              broadcasting_start_time=detail['broadcasting_start_time'],
                                              broadcasting_end_time=detail['broadcasting_end_time'],
                                              poster_url=detail['poster_url'],

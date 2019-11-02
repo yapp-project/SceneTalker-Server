@@ -30,7 +30,7 @@ class Post(models.Model):
         ordering = ["-created_at"]
 
     @property
-    def like_count(self):
+    def like_counts(self):
         return self.likes.all().count()
 
     def __str__(self):
@@ -38,9 +38,32 @@ class Post(models.Model):
 
 
 class PostSerializer(serializers.ModelSerializer):
+    is_mine = serializers.SerializerMethodField()
+    is_liked_by_me = serializers.SerializerMethodField()
+
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = (
+            'id',
+            'feed',
+            'author',
+            'content',
+            'image',
+            'likes',
+            'created_at',
+            'updated_at',
+            'like_counts',
+            'is_mine',
+            'is_liked_by_me'
+        )
+
+    def get_is_mine(self, obj):
+        request_user = self.context['request'].user
+        return obj.author == request_user
+
+    def get_is_liked_by_me(self, obj):
+        request_user = self.context['request'].user
+        return request_user in obj.likes.all()
 
 
 class Comment(models.Model):
@@ -58,6 +81,12 @@ class Comment(models.Model):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    is_mine = serializers.SerializerMethodField()
+
     class Meta:
         model = Comment
         fields = '__all__'
+
+    def get_is_mine(self, obj):
+        request_user = self.context['request'].user
+        return obj.author == request_user
