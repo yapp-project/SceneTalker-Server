@@ -17,7 +17,7 @@ class DramaListView(generics.ListAPIView):
             - title : 드라마 제목
             - summary : 줄거리
             - genre : 장르
-            - rating : 평점
+            - rating : 시청률
             - poster_url : 포스터 url
             - broadcasting_day : 방송요일
             - broadcasting_start_time : 방송 시작시간
