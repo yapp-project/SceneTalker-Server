@@ -22,7 +22,7 @@ class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
     image = models.ImageField(blank=True)  # s3에 올라가게 해야함
-    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='likes')
+    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='likes', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -32,6 +32,9 @@ class Post(models.Model):
     @property
     def like_count(self):
         return self.likes.all().count()
+
+    def __str__(self):
+        return '{} - {}'.format(self.feed.drama, self.content[:10])
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -49,6 +52,9 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+    def __str__(self):
+        return '{} - {}'.format(self.post.content, self.content)
 
 
 class CommentSerializer(serializers.ModelSerializer):
