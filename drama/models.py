@@ -23,7 +23,7 @@ class Drama(models.Model):
     broadcasting_start_time = models.TimeField()
     broadcasting_end_time = models.TimeField()
     broadcasting_station = models.CharField(max_length=20)
-    is_broadcasiting = models.BooleanField(default=True)
+    is_broadcasting = models.BooleanField(default=True)
     episode = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -36,8 +36,10 @@ class Drama(models.Model):
 
 
 class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):
+    from feed.models import FeedSerializer
     broadcasting_day = TagListSerializerField()
     genre = TagListSerializerField()
+    feed = FeedSerializer(read_only=True)
 
     class Meta:
         model = Drama
@@ -52,8 +54,9 @@ class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):
             'broadcasting_start_time',
             'broadcasting_end_time',
             'broadcasting_station',
-            'is_broadcasiting',
+            'is_broadcasting',
             'episode',
             'created_at',
-            'updated_at'
+            'updated_at',
+            'feed'
         )
