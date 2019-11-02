@@ -79,11 +79,11 @@ class NaverCrawler:
 
         try:
             if detail.find('span', class_='broad_txt').text == '방영중':
-                is_broadcasiting = True
+                is_broadcasting = True
             else:
-                is_broadcasiting = False
+                is_broadcasting = False
         except AttributeError:
-            is_broadcasiting = False
+            is_broadcasting = False
 
         try:
             broadcasting_station = detail.find('dd').find('a').text
@@ -117,7 +117,7 @@ class NaverCrawler:
                 'rating': rating,
                 'summary': summary,
                 'broadcasting_station': broadcasting_station,
-                'is_broadcasiting': is_broadcasiting,
+                'is_broadcasting': is_broadcasting,
                 'broadcasting_start_time': broadcasting_start_time,
                 'broadcasting_end_time': broadcasting_end_time,
                 'broadcasting_day': broadcasting_day,
@@ -152,15 +152,15 @@ def parse_day(day):
 
 def update_drama():
     crawler = NaverCrawler()
-    qs = Drama.objects.filter(is_broadcasiting=True)
+    qs = Drama.objects.filter(is_broadcasting=True)
     title_list = [drama.title for drama in qs]
     for title in title_list:
         detail = crawler.get_detail(title)
         if detail:
             Drama.objects.filter(title=title).update(rating=detail['rating'],
-                                                     is_broadcasiting=detail['is_broadcasiting'])
+                                                     is_broadcasting=detail['is_broadcasiting'])
         else:
-            Drama.objects.filter(title=title).update(is_broadcasiting=False)
+            Drama.objects.filter(title=title).update(is_broadcasting=False)
 
     for live_drama in crawler.get_live_drama_list():
         if live_drama not in title_list:
@@ -170,7 +170,7 @@ def update_drama():
                                              rating=detail['rating'],
                                              summary=detail['summary'],
                                              broadcasting_station=detail['broadcasting_station'],
-                                             is_broadcasiting=detail['is_broadcasiting'],
+                                             is_broadcasting=detail['is_broadcasiting'],
                                              broadcasting_start_time=detail['broadcasting_start_time'],
                                              broadcasting_end_time=detail['broadcasting_end_time'],
                                              poster_url=detail['poster_url'],
