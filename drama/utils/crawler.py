@@ -63,25 +63,22 @@ class NaverCrawler:
         html = self.search_keyword(keyword)
         soup = bs(html, 'html.parser')
 
-        detail = soup.find(id='brcs_detail')
+        detail = soup.select_one('.detail_info')
         if detail is None:
             return None
 
-        if hasattr(detail.find(id='layer_sy'), 'text'):
-            summary = detail.find(id='layer_sy').text.strip()
+        if hasattr(detail.find('p', class_='episode_txt _text'), 'text'):
+            summary = detail.find('p', class_='episode_txt _text').text.strip()
         else:
-            if hasattr(detail.find('dd', class_='intro _multiLayerContainer'), 'text'):
-                summary = detail.find('dd', class_='intro _multiLayerContainer').text.strip()
-            else:
-                summary = '알수없음'
+            summary = '알수없음'
 
         try:
-            rating = float(detail.select_one('.fred').text.replace('%', ''))
+            rating = float(detail.find('em').text)
         except AttributeError:
             rating = 0.0
 
         try:
-            if detail.find('dd').find('span').select_one('.broad_txt').text == '방영중':
+            if detail.find('span', class_='broad_txt').text == '방영중':
                 is_broadcasiting = True
             else:
                 is_broadcasiting = False
@@ -89,23 +86,23 @@ class NaverCrawler:
             is_broadcasiting = False
 
         try:
-            broadcasting_station = detail.find('dd').find('span').find('a').text
+            broadcasting_station = detail.find('dd').find('a').text
         except AttributeError:
             broadcasting_station = '알수없음'
 
         try:
-            poster_url = soup.select_one('.brcs_thumb').find('img').attrs['src']
+            poster_url = soup.find('div', class_='main_thumb').find('img').attrs['src']
         except AttributeError:
             poster_url = 'https://webhostingmedia.net/wp-content/uploads/2018/01/http-error-404-not-found.png'
 
         try:
-            episode = soup.find('div', class_='brcs_newest btm top_line').find('a').text
+            episode = soup.find('dl', class_='turn_info_desc').find('strong').text
         except AttributeError:
             episode = '알수없음'
 
         try:
-            datetime_info = detail.find('span', class_='inline').text.split('|')[1].strip().split(' [')[0]
-            broadcasting_day = parse_day(datetime_info[:-9][1:-1])
+            datetime_info = detail.find('span').text.strip()
+            broadcasting_day = parse_day(datetime_info.split('(')[1].split(')')[0])
             time_info = datetime_info.split(') ')[1]
             if time_info[:2] == '오전':
                 broadcasting_start_time = datetime.strptime(time_info[3:], "%H:%M") - timedelta(minutes=10)
@@ -157,7 +154,6 @@ def update_drama():
     crawler = NaverCrawler()
     qs = Drama.objects.filter(is_broadcasiting=True)
     title_list = [drama.title for drama in qs]
-
     for title in title_list:
         detail = crawler.get_detail(title)
         if detail:
