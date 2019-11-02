@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import pymysql
 
+pymysql.install_as_MySQLdb()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -22,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 's!3++@bf%!thsc&1j&^cnwma#vrxn)!^=g)yty_r5f05sqt93y'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -87,12 +89,25 @@ WSGI_APPLICATION = 'SceneTalker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'scene-talker',  # DB명
+            'USER': 'admin',  # 데이터베이스 계정
+            'PASSWORD': 'scenetalker',  # 계정 비밀번호
+            'HOST': 'scene-talker.c416hxy60fs8.ap-northeast-2.rds.amazonaws.com',  # 데이테베이스 주소(IP)
+            'PORT': '3306',  # 데이터베이스 포트(보통은 3306)
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

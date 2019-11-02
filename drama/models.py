@@ -37,9 +37,10 @@ class Drama(models.Model):
 
 class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):
     from feed.models import FeedSerializer
+    feed = FeedSerializer(read_only=True)
+    is_bookmarked_by_me = serializers.SerializerMethodField()
     broadcasting_day = TagListSerializerField()
     genre = TagListSerializerField()
-    feed = FeedSerializer(read_only=True)
 
     class Meta:
         model = Drama
@@ -55,8 +56,13 @@ class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):
             'broadcasting_end_time',
             'broadcasting_station',
             'is_broadcasting',
+            'is_bookmarked_by_me',
             'episode',
             'created_at',
             'updated_at',
             'feed'
         )
+
+    def get_is_bookmarked_by_me(self, drama):
+        request_user = self.context['request'].user
+        return drama in request_user.drama_bookmark.all()

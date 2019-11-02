@@ -72,19 +72,23 @@ class PostRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PostSerializer
 
 
-def like_post(request, feed_id, post_id):
-    if request.method == 'POST':
-        try:
-            post = Post.objects.get(id=post_id)
-            print(post.likes)
-            # if post.likes.filter(username=request.user.username).exists:
-            #     post.likes.remove(request.user)
-            # else:
-            #     post.likes.add(request.user)
+class PostLikesUpdateAPIView(APIView):
+    """
+        게시물 좋아요 API
 
-            return JsonResponse({'status_code': '200'})
-        except:
-            return JsonResponse({'status_code': '200'})
+        ---
+        # Path Params
+            - feed_id : 피드 id
+            - post_id : 게시물 id
+    """
+    def post(self, request, feed_id, post_id):
+        post = Post.objects.get(id=post_id)
+        if request.user in post.likes.all():
+            post.likes.remove(request.user)
+        else:
+            post.likes.add(request.user)
+
+        return Response()
 
 
 class CommentListCreateAPIView(APIView):
