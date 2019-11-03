@@ -33,6 +33,10 @@ class Post(models.Model):
     def like_counts(self):
         return self.likes.all().count()
 
+    @property
+    def comment_counts(self):
+        return self.comment_set.all().count()
+
     def __str__(self):
         return '{} - {}'.format(self.feed.drama, self.content[:10])
 
@@ -53,6 +57,7 @@ class PostSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'like_counts',
+            'comment_counts',
             'is_mine',
             'is_liked_by_me'
         )

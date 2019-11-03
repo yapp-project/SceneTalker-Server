@@ -25,6 +25,7 @@ class DramaListView(generics.ListAPIView):
             - broadcasting_end_time : 방송 종료시간
             - broadcasting_station : 방송국
             - is_broadcasting : 방영중 여부
+            - is_bookmarked_by_me : 사용자가 북마크했는지 여부
             - episode : 부
             - created_at : 생성시간
             - updated_at : 수정시간
