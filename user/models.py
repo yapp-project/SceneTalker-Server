@@ -7,7 +7,7 @@ class User(AbstractUser) :
 
     profile_image = models.ImageField(null=True, blank=True)
     name = models.CharField(max_length=255)
-    drama_bookmark = models.ManyToManyField(Drama, blank=True, null=True)
+    drama_bookmark = models.ManyToManyField(Drama, blank=True)
 
     def __str__(self) :
         return self.username
