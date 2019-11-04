@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 's!3++@bf%!thsc&1j&^cnwma#vrxn)!^=g)yty_r5f05sqt93y'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -101,7 +101,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'scene-talker',  # DB명
+            'NAME': 'scene_talker',  # DB명
             'USER': 'admin',  # 데이터베이스 계정
             'PASSWORD': 'scenetalker',  # 계정 비밀번호
             'HOST': 'scene-talker.c416hxy60fs8.ap-northeast-2.rds.amazonaws.com',  # 데이테베이스 주소(IP)
