@@ -2,6 +2,7 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.parsers import FileUploadParser, MultiPartParser
 from rest_framework import status
 from django.contrib.auth import get_user_model
 
@@ -75,4 +76,17 @@ class GetRealTimeUserBestDrama(APIView) :
 
         print(user_drama_bookmarks)
 
+        return Response(status=status.HTTP_200_OK)
+
+class PutUserProfileImage(APIView) :
+
+    parser_classes = [MultiPartParser]
+
+    def put(self, request, username, filename, format=None) :
+
+        user = request.user
+
+        file_obj = request.data['file']
+
+        user.profile_image.save(filename, file_obj, save=True)
         return Response(status=status.HTTP_200_OK)
