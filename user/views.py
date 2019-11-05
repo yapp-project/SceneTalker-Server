@@ -33,38 +33,26 @@ class UserViewSet(APIView) :
 
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
+class ToggleDramaBookmark(APIView) :
 
-class AddDramaBookmark(APIView) :
-
-    def post(self, request, drama_title, format=None) :
-
-        user = request.user
-
-        try :
-            drama = Drama.objects.get(title=drama_title)
-        except Drama.DoesNotExist :
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        user.drama_bookmark.add(drama)
-        user.save()
-
-        return Response(status=status.HTTP_200_OK)
-
-class RemoveDramaBookmark(APIView) :
-
-    def post(self, request, drama_title, format=None) :
+    def post(self, request, drama_id, format=None) :
 
         user = request.user
 
         try :
-            drama = Drama.objects.get(title=drama_title)
-        except Drama.DoesNotExist :
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            drama = Drama.objects.get(id=drama_id)
 
-        user.drama_bookmark.remove(drama)
+        except Drama.DoesNotExist :
+            return Response({"description" : "NOT FOUND"},status=status.HTTP_404_NOT_FOUND)
+
+        if drama in user.drama_bookmark.all() :
+            user.drama_bookmark.remove(drama)
+        else :
+            user.drama_bookmark.add(drama)
+
         user.save()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response({"description" : "OK"},status=status.HTTP_200_OK)
 
 class GetRealTimeUserBestDrama(APIView) :
 
@@ -72,7 +60,7 @@ class GetRealTimeUserBestDrama(APIView) :
 
         user = request.user
 
-        user_drama_bookmarks = user.drama_bookmark.filter(is_broadcasiting=True).first()
+        user_drama_bookmarks = user.drama_bookmark.filter(is_broadcasting=True).first()
 
         print(user_drama_bookmarks)
 

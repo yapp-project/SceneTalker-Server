@@ -11,11 +11,11 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     
-    drama_bookmark = DramaSerializer(many=True, read_only=True)
+    # drama_bookmark = DramaSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'profile_image', 'drama_bookmark']
+        fields = ['username', 'first_name', 'profile_image']
 
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
