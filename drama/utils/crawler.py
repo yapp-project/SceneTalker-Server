@@ -158,7 +158,7 @@ def update_drama():
         detail = crawler.get_detail(title)
         if detail:
             Drama.objects.filter(title=title).update(rating=detail['rating'],
-                                                     is_broadcasting=detail['is_broadcasiting'])
+                                                     is_broadcasting=detail['is_broadcasting'])
         else:
             Drama.objects.filter(title=title).update(is_broadcasting=False)
 
