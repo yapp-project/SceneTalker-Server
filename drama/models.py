@@ -34,6 +34,28 @@ class Drama(models.Model):
     def __str__(self):
         return '제목: {}'.format(self.title)
 
+class DramaEachEpisode(models.Model) :
+    drama = models.ForeignKey(Drama, on_delete=models.CASCADE, related_name='each_episodes')
+    episode = models.CharField(max_length=20)
+    soda_count = models.IntegerField(default=0)
+    sweet_potato_count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return '제목 : {}, 회차 : {}, 사이다 : {}개, 고구마 : {}개'.format(
+            self.drama.title, self.episode, self.soda_count, self.sweet_potato_count)
+
+
+
+class DramaEachEpisodeSerializer(serializers.ModelSerializer) :
+
+    class Meta :
+        model = DramaEachEpisode
+        fields = (
+            'episode',
+            'soda_count',
+            'sweet_potato_count'
+        )
+
 
 class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):
     from feed.models import FeedSerializer
@@ -41,6 +63,7 @@ class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):
     is_bookmarked_by_me = serializers.SerializerMethodField()
     broadcasting_day = TagListSerializerField()
     genre = TagListSerializerField()
+    each_episodes = DramaEachEpisodeSerializer(read_only=True, many=True)
 
     class Meta:
         model = Drama
@@ -60,6 +83,7 @@ class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):
             'episode',
             'created_at',
             'updated_at',
+            'each_episodes',
             'feed'
         )
 
