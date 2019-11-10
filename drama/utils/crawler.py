@@ -110,7 +110,8 @@ class NaverCrawler:
                 broadcasting_start_time = datetime.strptime(f'{int(time_info[3:5]) + 12}{time_info[5:]}',
                                                             "%H:%M") - timedelta(minutes=10)
             broadcasting_end_time = broadcasting_start_time + timedelta(hours=1, minutes=30)
-        except AttributeError:
+        except Exception as e:
+            print(e)
             return None
 
         return {'title': keyword,
