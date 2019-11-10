@@ -189,8 +189,8 @@ CRONJOBS = [
 CRONTAB_LOCK_JOBS = True
 
 # AWS S3 설정
-DEFAULT_FILE_STORAGE = 'config.aws_storages.S3DefaultStorage'
-STATICFILES_STORAGE = 'config.aws_storages.S3StaticStorage'
+DEFAULT_FILE_STORAGE = 'conf.storages.S3DefaultStorage'
+STATICFILES_STORAGE = 'conf.storages.S3StaticStorage'
 
 # AWS Access
 AWS_ACCESS_KEY_ID = secrets['AWS_ACCESS_KEY_ID']
