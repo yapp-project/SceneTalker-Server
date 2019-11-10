@@ -12,10 +12,13 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 import pymysql
+import json
 
 pymysql.install_as_MySQLdb()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SECRET_DIR = os.path.join(BASE_DIR, 'conf')
+secrets = json.load(open(os.path.join(SECRET_DIR, 'secrets.json'), 'rb'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -54,6 +57,7 @@ INSTALLED_APPS = [
     'feed',
     'taggit',
     'drf_yasg',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -102,9 +106,9 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'scene_talker',  # DB명
-            'USER': 'admin',  # 데이터베이스 계정
-            'PASSWORD': 'scenetalker',  # 계정 비밀번호
-            'HOST': 'scene-talker.c416hxy60fs8.ap-northeast-2.rds.amazonaws.com',  # 데이테베이스 주소(IP)
+            'USER': secrets['DATABASES_USER'],  # 데이터베이스 계정
+            'PASSWORD': secrets['DATABASES_PASSWORD'],  # 계정 비밀번호
+            'HOST': secrets['DATABASES_HOST'],  # 데이테베이스 주소(IP)
             'PORT': '3306',  # 데이터베이스 포트(보통은 3306)
         }
     }
@@ -183,3 +187,15 @@ CRONJOBS = [
     ('0 6,18 * * *', 'drama.utils.crawler.update_drama', '>> 로그남길장소'),
 ]
 CRONTAB_LOCK_JOBS = True
+
+# AWS S3 설정
+DEFAULT_FILE_STORAGE = 'config.aws_storages.S3DefaultStorage'
+STATICFILES_STORAGE = 'config.aws_storages.S3StaticStorage'
+
+# AWS Access
+AWS_ACCESS_KEY_ID = secrets['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = secrets['AWS_SECRET_ACCESS_KEY']
+AWS_DEFAULT_ACL = secrets['AWS_DEFAULT_ACL']
+AWS_S3_REGION_NAME = secrets['AWS_S3_REGION_NAME']
+AWS_S3_SIGNATURE_VERSION = secrets['AWS_S3_SIGNATURE_VERSION']
+AWS_STORAGE_BUCKET_NAME = secrets['AWS_STORAGE_BUCKET_NAME']
