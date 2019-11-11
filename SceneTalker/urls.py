@@ -4,6 +4,8 @@ from django.contrib import admin
 from drf_yasg.views import get_schema_view
 from rest_framework.permissions import AllowAny
 from drf_yasg import openapi
+from django.conf.urls.static import static
+from django.conf import settings
 
 schema_view_v1 = get_schema_view(
     openapi.Info(
@@ -32,3 +34,7 @@ urlpatterns = [
     url(r'^swagger/v1/$', schema_view_v1.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^redoc/v1/$', schema_view_v1.with_ui('redoc', cache_timeout=0), name='schema-redoc-v1'),
 ]
+
+if settings.DEBUG :
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
