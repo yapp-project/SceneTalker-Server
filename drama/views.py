@@ -11,7 +11,7 @@ class DramaListView(generics.ListAPIView):
 
         ---
         # Query Params
-            - onair : Array[true, false]
+            - onair : String[true, false]
             - page : Integer
         # Response
             - id : 드라마 id

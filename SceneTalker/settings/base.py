@@ -11,15 +11,18 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import json
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SECRET_DIR = os.path.join(BASE_DIR, 'conf')
+secrets = json.load(open(os.path.join(SECRET_DIR, 'secrets.json'), 'rb'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 's!3++@bf%!thsc&1j&^cnwma#vrxn)!^=g)yty_r5f05sqt93y'
+SECRET_KEY = secrets['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -159,3 +162,4 @@ CRONJOBS = [
     ('0 6,18 * * *', 'drama.utils.crawler.update_drama', '>> 로그남길장소'),
 ]
 CRONTAB_LOCK_JOBS = True
+

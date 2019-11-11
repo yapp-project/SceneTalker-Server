@@ -34,7 +34,8 @@ class Drama(models.Model):
     def __str__(self):
         return '제목: {}'.format(self.title)
 
-class DramaEachEpisode(models.Model) :
+
+class DramaEachEpisode(models.Model):
     drama = models.ForeignKey(Drama, on_delete=models.CASCADE, related_name='each_episodes')
     episode = models.CharField(max_length=20)
     soda_count = models.IntegerField(default=0)
@@ -45,10 +46,8 @@ class DramaEachEpisode(models.Model) :
             self.drama.title, self.episode, self.soda_count, self.sweet_potato_count)
 
 
-
-class DramaEachEpisodeSerializer(serializers.ModelSerializer) :
-
-    class Meta :
+class DramaEachEpisodeSerializer(serializers.ModelSerializer):
+    class Meta:
         model = DramaEachEpisode
         fields = (
             'episode',
