@@ -1,20 +1,25 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from .models import *
-# from drama.models import *
+from drama.models import *
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    def set_count(self, channel_layer, group_name, count_value) :
+
+        count = getattr(channel_layer, group_name, 0)
+
+        setattr(channel_layer, group_name, count + count_value)
+
+        return count
+
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.user_name = self.scope['url_route']['kwargs']['user_name']
         self.room_group_name = 'chat_%s' % self.room_name
 
-        count = getattr(self.channel_layer, self.room_group_name, 0)
-        if not count:
-            setattr(self.channel_layer, self.room_group_name, 1)
-        else:
-            setattr(self.channel_layer, self.room_group_name, count + 1)
-        print("join", self.channel_layer, self.room_group_name, count)
+        count = self.set_count(self.channel_layer, self.room_group_name, 1)
+
+        print("join", self.channel_layer, self.room_group_name, count + 1)
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -23,11 +28,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
-        count = getattr(self.channel_layer, self.room_group_name, 0)
-        setattr(self.channel_layer, self.room_group_name, count - 1)
-        if count == 1:
+        count = self.set_count(self.channel_layer, self.room_group_name, -1)
+
+        if count - 1 == 0 :
             delattr(self.channel_layer, self.room_group_name)
-        print("Leave", count)
+
+        print("Leave", count - 1)
         print("Close Code :", close_code)
         # Leave room group
         await self.channel_layer.group_discard(
@@ -42,7 +48,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print(_type)
         if _type == 'chat_message' :
             message = text_data_json['message']
-            # sender = self.scope['session']['user_id']
             sender = self.user_name
 
             print("Receive message from WebSocket")
@@ -58,15 +63,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
         elif _type == 'count' :
             kind = text_data_json['kind']
-            count = getattr(self.channel_layer, self.room_group_name + kind, 0)
-            if not count:
-                setattr(self.channel_layer, self.room_group_name + kind, 1)
-            else:
-                setattr(self.channel_layer, self.room_group_name + kind, count + 1)
 
-            print(self.room_group_name, kind, count)
+            count = self.set_count(self.channel_layer, self.room_group_name + kind, 1)
+
+            print(self.room_group_name, kind, count + 1)
 
             if count % 10 == 0:
+                # drama_each_episode = DramaEachEpisode.objects.filter(drama__id=self.room_name).last()
+                
+                # if kind == 'soda' :
+                #     drama_each_episode.soda_count = count
+                # elif kind == 'potato' :
+                #     drama_each_episode.sweet_potato_count = count
+
+                # drama_each_episode.save()
+
+                # print(drama_each_episode)
+
                 await self.channel_layer.group_send(
                     self.room_group_name,
                     {
@@ -91,7 +104,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'kind': kind
             }))
         else :
-
             print("Receive message from room group", sender, receiver)
 
             # Send message to WebSocket

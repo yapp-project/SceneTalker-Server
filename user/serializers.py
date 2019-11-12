@@ -6,6 +6,7 @@ from allauth.account import app_settings as allauth_settings
 from allauth.utils import email_address_exists
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
+from django.utils.translation import ugettext_lazy as _
 
 User = get_user_model()
 
@@ -33,7 +34,18 @@ class RegisterSerializer(serializers.Serializer):
         return email
 
     def validate_password1(self, password):
+        if len(password) < 8 :
+            raise serializers.ValidationError(
+                    _("Password is too short"))
+
         return get_adapter().clean_password(password)
+
+    def validate_first_name(self, first_name) :
+        if (first_name,) in User.objects.all().values_list('first_name') :
+            raise serializers.ValidationError(
+                    _("The first name is already registered"))
+        
+        return first_name
 
     def validate(self, data):
         if data['password1'] != data['password2']:

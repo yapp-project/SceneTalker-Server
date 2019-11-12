@@ -11,20 +11,21 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-import pymysql
+import json
 
-pymysql.install_as_MySQLdb()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SECRET_DIR = os.path.join(BASE_DIR, 'conf')
+secrets = json.load(open(os.path.join(SECRET_DIR, 'secrets.json'), 'rb'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 's!3++@bf%!thsc&1j&^cnwma#vrxn)!^=g)yty_r5f05sqt93y'
+SECRET_KEY = secrets['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     'feed',
     'taggit',
     'drf_yasg',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -86,29 +88,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'SceneTalker.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
-
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'scene_talker',  # DB명
-            'USER': 'admin',  # 데이터베이스 계정
-            'PASSWORD': 'scenetalker',  # 계정 비밀번호
-            'HOST': 'scene-talker.c416hxy60fs8.ap-northeast-2.rds.amazonaws.com',  # 데이테베이스 주소(IP)
-            'PORT': '3306',  # 데이터베이스 포트(보통은 3306)
-        }
-    }
-
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
@@ -132,7 +111,7 @@ AUTH_USER_MODEL = 'user.User'
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ko'
 
 TIME_ZONE = 'Asia/Seoul'
 
@@ -180,6 +159,8 @@ CHANNEL_LAYERS = {
 }
 
 CRONJOBS = [
-    ('0 6,18 * * *', 'drama.utils.crawler.update_drama', '>> 로그남길장소'),
+    ('0 6,18 * * *', 'drama.utils.crawler.update_drama', '>> /home/ubuntu/scenetalker/SceneTalker-Server/drama/utils/drama.log'),
 ]
 CRONTAB_LOCK_JOBS = True
+CRONTAB_DJANGO_SETTINGS_MODULE = 'SceneTalker.settings.production.py'
+

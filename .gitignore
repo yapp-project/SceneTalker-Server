@@ -14,7 +14,9 @@ chat/migrations
 drama/migrations
 feed/migrations
 media
-
+# SceneTalker/settings/local.py
+conf/secrets.json
+.idea/
 # If your build process includes running collectstatic, then you probably don't need or want to include staticfiles/
 # in your Git repository. Update and uncomment the following line accordingly.
 # <django-project-name>/staticfiles/
@@ -140,4 +142,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# End of https://www.gitignore.io/api/django
+# End of https://www.gitignore.io/api/djang
+# 
