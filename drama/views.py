@@ -1,6 +1,8 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from .models import Drama, DramaSerializer
+from rest_framework.views import APIView
+from rest_framework import status
+from .models import Drama, DramaSerializer, DramaEachEpisode, DramaEachEpisodeSerializer
 from datetime import datetime
 from .utils.crawler import update_drama
 
@@ -54,3 +56,17 @@ class DramaListView(generics.ListAPIView):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class DramaEachEpisodeList(APIView) :
+
+    def get(self, request, drama_id, format=None) :
+        try :
+            drama = Drama.objects.get(id=drama_id)
+        except :
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        queryset = DramaEachEpisode.objects.filter(drama__id=drama_id)
+        serializer = DramaEachEpisodeSerializer(queryset, many=True)
+
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
