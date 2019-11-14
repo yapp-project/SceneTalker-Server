@@ -159,7 +159,7 @@ CHANNEL_LAYERS = {
 }
 
 CRONJOBS = [
-    ('0 12 * * *', 'drama.utils.crawler.update_drama', '> /home/ubuntu/scenetalker/SceneTalker-Server/drama/utils/update.log 2 >&1'),
+    ('37 0 * * *', 'drama.utils.crawler.update_drama', '>> /home/ubuntu/scenetalker/SceneTalker-Server/drama/utils/update.log'),
 ]
 CRONTAB_LOCK_JOBS = True
 CRONTAB_DJANGO_SETTINGS_MODULE = 'SceneTalker.settings.production'
