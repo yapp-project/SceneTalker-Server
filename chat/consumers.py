@@ -1,5 +1,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
+from rest_framework.response import Response
+from rest_framework import status
 from .models import *
 from drama.models import *
 
@@ -15,11 +17,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.user_name = self.scope['url_route']['kwargs']['user_name']
+        self.episode = self.scope['url_route']['kwargs']['episode']
         self.room_group_name = 'chat_%s' % self.room_name
-
+        
         count = self.set_count(self.channel_layer, self.room_group_name, 1)
 
-        print("join", self.channel_layer, self.room_group_name, count + 1)
+        print("join", self.channel_layer, self.room_group_name, self.episode, count + 1)
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -69,16 +72,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print(self.room_group_name, kind, count + 1)
 
             if count % 10 == 0:
-                # drama_each_episode = DramaEachEpisode.objects.filter(drama__id=self.room_name).last()
+                try :
+                    drama_each_episode = DramaEachEpisode.objects.get(drama__id=self.room_name, 
+                                                                episode=self.episode)
+                except DramaEachEpisode.DoesNotExist :
+                    return
+                    # drama = Drama.objects.get(id=self.room_name)
+
+                    # drama_each_episode = DramaEachEpisode.objects.create(
+                    #     drama=drama,
+                    #     episode=self.episode
+                    # )
                 
-                # if kind == 'soda' :
-                #     drama_each_episode.soda_count = count
-                # elif kind == 'potato' :
-                #     drama_each_episode.sweet_potato_count = count
+                if kind == 'soda' :
+                    drama_each_episode.soda_count = count
+                elif kind == 'potato' :
+                    drama_each_episode.sweet_potato_count = count
 
-                # drama_each_episode.save()
+                drama_each_episode.save()
 
-                # print(drama_each_episode)
+                print(drama_each_episode)
 
                 await self.channel_layer.group_send(
                     self.room_group_name,

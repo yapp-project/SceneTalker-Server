@@ -45,12 +45,13 @@
     <input id="chat-message-input" type="text" size="100"/><br/>
     <input id="chat-message-submit" type="button" value="Send"/><br>
     <input id="soda-button" type="button" value="soda"/><span id="soda-count">0</span><br>
-    <input id="potato-button" type="button" value="potato"/><span id="soda-count">0</span><br>
+    <input id="potato-button" type="button" value="potato"/><span id="potato-count">0</span><br>
 </body>
 
 <script>
     var roomName = {{ room_name_json }};
     var currentUserName = {{ current_user_name_json }};
+    var episode = {{ episode }};
     var chat_count = 0;
 
     // var chatSocket = new WebSocket(
@@ -60,7 +61,21 @@
 
     var chatSocket = new WebSocket(
         'ws://' + window.location.host +
-        '/ws/chat/' + roomName + '/' + currentUserName + '/');
+        '/ws/chat/' + roomName + '/' + episode + '/' + currentUserName + '/');
+
+    // console.log("http://" + window.location.host + '/chat/count/' + roomName + '/' + episode + '/');
+
+    fetch("http://" + window.location.host + '/chat/count/' + roomName + '/' + episode + '/')
+    .then(e => e.json())
+    .then(e => {
+        console.log(e);
+        $("#soda-count").html(e.soda_count);
+        $("#potato-count").html(e.sweet_potato_count);
+    });
+
+    chatSocket.onerror = function(e){
+        console.log(e);
+    }
 
     chatSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
@@ -74,7 +89,7 @@
             if(kind === 'soda'){
                 var soda_count = parseInt($("#soda-count").html());
                 console.log(soda_count);
-                soda_count += 1;
+                soda_count += 10;
                 $("#soda-count").html(soda_count);
             }
             else if(kind == 'potato'){
