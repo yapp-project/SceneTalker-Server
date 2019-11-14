@@ -1,4 +1,4 @@
-from drama.models import Drama
+from drama.models import Drama, DramaEachEpisode
 from feed.models import Feed
 from bs4 import BeautifulSoup as bs
 from datetime import datetime, timedelta
@@ -158,8 +158,16 @@ def update_drama():
     for title in title_list:
         detail = crawler.get_detail(title)
         if detail:
+            drama = Drama.objects.get(title=title)
+            if (drama.episode != detail['episode']) and (detail['episode'][0].isdigit()):
+                drama_each_episode = DramaEachEpisode.objects.create(
+                    drama=drama,
+                    episode=detail['episode']
+                )
+
             Drama.objects.filter(title=title).update(rating=detail['rating'],
-                                                     is_broadcasting=detail['is_broadcasting'])
+                                                     is_broadcasting=detail['is_broadcasting'],
+                                                     episode=detail['episode'])
         else:
             Drama.objects.filter(title=title).update(is_broadcasting=False)
 
@@ -176,6 +184,12 @@ def update_drama():
                                              broadcasting_end_time=detail['broadcasting_end_time'],
                                              poster_url=detail['poster_url'],
                                              episode=detail['episode'])
+
+                drama_each_episode = DramaEachEpisode.objects.create(
+                    drama=drama,
+                    episode=detail['episode']
+                )
+
                 for day in detail['broadcasting_day']:
                     drama.broadcasting_day.add(day)
 
