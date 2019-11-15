@@ -40,14 +40,17 @@ class DramaListView(generics.ListAPIView):
 
 
 class DramaEachEpisodeList(APIView):
+    """
+        해당 드라마의 회차별 고구마, 사이다 개수 리스트를 불러오는 API
+
+        ---
+        # Query Params
+            - drama_id : Integer
+    """
 
     def get(self, request, drama_id, format=None):
-        try:
-            drama = Drama.objects.get(id=drama_id)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        queryset = DramaEachEpisode.objects.filter(drama__id=drama_id)
+        drama = Drama.objects.get(id=drama_id)
+        queryset = DramaEachEpisode.objects.filter(drama=drama)
         serializer = DramaEachEpisodeSerializer(queryset, many=True)
 
         return Response(data=serializer.data, status=status.HTTP_200_OK)
