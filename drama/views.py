@@ -15,25 +15,6 @@ class DramaListView(generics.ListAPIView):
         # Query Params
             - onair : String[true, false]
             - page : Integer
-        # Response
-            - id : 드라마 id
-            - title : 드라마 제목
-            - summary : 줄거리
-            - genre : 장르
-            - rating : 시청률
-            - poster_url : 포스터 url
-            - broadcasting_day : 방송요일
-            - broadcasting_start_time : 방송 시작시간
-            - broadcasting_end_time : 방송 종료시간
-            - broadcasting_station : 방송국
-            - is_broadcasting : 방영중 여부
-            - is_bookmarked_by_me : 사용자가 북마크했는지 여부
-            - episode : 부
-            - created_at : 생성시간
-            - updated_at : 수정시간
-            - feed : 피드정보
-                - id : 피드 id
-                - drama : 드라마 id
     """
     queryset = Drama.objects.all()
     serializer_class = DramaSerializer
@@ -58,12 +39,12 @@ class DramaListView(generics.ListAPIView):
         return Response(serializer.data)
 
 
-class DramaEachEpisodeList(APIView) :
+class DramaEachEpisodeList(APIView):
 
-    def get(self, request, drama_id, format=None) :
-        try :
+    def get(self, request, drama_id, format=None):
+        try:
             drama = Drama.objects.get(id=drama_id)
-        except :
+        except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         queryset = DramaEachEpisode.objects.filter(drama__id=drama_id)
