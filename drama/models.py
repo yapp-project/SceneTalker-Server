@@ -62,7 +62,6 @@ class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):
     is_bookmarked_by_me = serializers.SerializerMethodField()
     broadcasting_day = TagListSerializerField()
     genre = TagListSerializerField()
-    each_episodes = DramaEachEpisodeSerializer(read_only=True, many=True)
 
     class Meta:
         model = Drama
@@ -82,7 +81,6 @@ class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):
             'episode',
             'created_at',
             'updated_at',
-            'each_episodes',
             'feed'
         )
 
