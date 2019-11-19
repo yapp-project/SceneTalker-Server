@@ -1,5 +1,4 @@
 from .models import Post, Comment, PostSerializer, CommentSerializer, Feed
-from django.http import JsonResponse
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -14,8 +13,13 @@ class PostListCreateAPIView(APIView):
             ---
             # Path Params
                 - feed_id : 피드 id
+            # Query Params
+                - content : 게시물 검색 내용
         """
+        query_params = request.query_params.get('content')
         posts = Feed.objects.prefetch_related('post_set').get(id=feed_id).post_set.all()
+        if query_params:
+            posts = posts.filter(content__icontains=query_params)
         serializer = PostSerializer(posts, context={'request': request}, many=True)
         return Response(serializer.data)
 
