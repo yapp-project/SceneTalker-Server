@@ -111,7 +111,7 @@ class NaverCrawler:
                                                             "%H:%M") - timedelta(minutes=10)
             broadcasting_end_time = broadcasting_start_time + timedelta(hours=1, minutes=30)
         except Exception as e:
-            print(e)
+            print(f'드라마: {keyword} 오류: {e}')
             return None
 
         return {'title': keyword,
@@ -160,10 +160,7 @@ def update_drama():
         if detail:
             drama = Drama.objects.get(title=title)
             if (drama.episode != detail['episode']) and (detail['episode'][0].isdigit()):
-                drama_each_episode = DramaEachEpisode.objects.create(
-                    drama=drama,
-                    episode=detail['episode']
-                )
+                DramaEachEpisode.objects.create(drama=drama, episode=detail['episode'])
 
             Drama.objects.filter(title=title).update(rating=detail['rating'],
                                                      is_broadcasting=detail['is_broadcasting'],
@@ -185,10 +182,7 @@ def update_drama():
                                              poster_url=detail['poster_url'],
                                              episode=detail['episode'])
 
-                drama_each_episode = DramaEachEpisode.objects.create(
-                    drama=drama,
-                    episode=detail['episode']
-                )
+                DramaEachEpisode.objects.create(drama=drama, episode=detail['episode'])
 
                 for day in detail['broadcasting_day']:
                     drama.broadcasting_day.add(day)
