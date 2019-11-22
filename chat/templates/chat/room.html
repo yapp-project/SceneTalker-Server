@@ -64,6 +64,7 @@
         '/ws/chat/' + roomName + '/' + episode + '/' + currentUserName + '/');
 
     // console.log("http://" + window.location.host + '/chat/count/' + roomName + '/' + episode + '/');
+    console.log(chatSocket);
 
     fetch("http://" + window.location.host + '/chat/count/' + roomName + '/' + episode + '/')
     .then(e => e.json())

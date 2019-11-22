@@ -9,12 +9,12 @@ from rest_framework.response import Response
 from rest_framework import status
 
 # Create your views here.
-def room(request, room_name, episode, user_name):
+def room(request, drama_id, episode, user_name):
 
     current_user = user_name
 
     context = {
-                'room_name_json' : mark_safe(json.dumps(room_name)), 
+                'room_name_json' : mark_safe(json.dumps(drama_id)), 
                 'episode' : mark_safe(json.dumps(episode)), 
                 'current_user_name_json' : mark_safe(json.dumps(current_user)),
                 'current_user' : current_user 

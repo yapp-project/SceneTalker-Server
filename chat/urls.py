@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
     path('count/<int:drama_id>/<str:episode>/', view=views.GetDramaEachEpisodeCount.as_view()),
-    path('<str:room_name>/<str:episode>/<str:user_name>/', views.room, name='room'),
+    path('<str:drama_id>/<str:episode>/<str:user_name>/', views.room, name='room'),
 ]

@@ -4,6 +4,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import *
 from drama.models import *
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     def set_count(self, channel_layer, group_name, count_value) :
@@ -15,14 +18,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return count
 
     async def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.user_name = self.scope['url_route']['kwargs']['user_name']
+        self.drama_id = self.scope['url_route']['kwargs']['drama_id']
         self.episode = self.scope['url_route']['kwargs']['episode']
-        self.room_group_name = 'chat_%s' % self.room_name
+        self.user_id = self.scope['url_route']['kwargs']['user_id']
+        user = User.objects.get(id=self.user_id)
+        self.user_name = user.first_name
+        self.room_group_name = 'chat_%s' % self.drama_id
         
         count = self.set_count(self.channel_layer, self.room_group_name, 1)
 
-        print("join", self.channel_layer, self.room_group_name, self.episode, count + 1)
+        print("join", self.channel_layer, self.room_group_name, self.user_name, self.episode, count + 1)
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -73,16 +78,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             if count % 10 == 0:
                 try :
-                    drama_each_episode = DramaEachEpisode.objects.get(drama__id=self.room_name, 
+                    drama_each_episode = DramaEachEpisode.objects.get(drama__id=self.drama_id, 
                                                                 episode=self.episode)
                 except DramaEachEpisode.DoesNotExist :
                     return
-                    # drama = Drama.objects.get(id=self.room_name)
-
-                    # drama_each_episode = DramaEachEpisode.objects.create(
-                    #     drama=drama,
-                    #     episode=self.episode
-                    # )
                 
                 if kind == 'soda' :
                     drama_each_episode.soda_count = count
