@@ -97,7 +97,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     {
                         'type': 'chat_message',
                         'kind': str(kind),
-                        'message': str(kind) + str(count) + "개 돌파!",
+                        'message': str(count),
                         'sender': 'AdminServer'
                     }
                 )
