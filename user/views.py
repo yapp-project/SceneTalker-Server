@@ -40,7 +40,7 @@ class GetUserByToken(APIView):
     def post(self, request):
         token = Token.objects.get(key=request.data['token'])
         user = User.objects.get(id=token.user_id)
-        return Response({'token': token.key, 'name': user.first_name})
+        return Response({'token': token.key, 'user_id': user.id})
 
 class ToggleDramaBookmark(APIView) :
 
