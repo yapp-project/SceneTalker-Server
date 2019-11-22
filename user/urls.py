@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 
 app_name = "user"
 urlpatterns = [
+    path("authenticate/", view = views.GetUserByToken.as_view()),
     path("<str:username>/", view = views.UserViewSet.as_view()),
     path("bookmarkDrama/", view = views.GetRealTimeUserBestDrama.as_view()),
     path("<int:drama_id>/bookmark/", view=views.ToggleDramaBookmark.as_view()),

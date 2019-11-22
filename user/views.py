@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.parsers import FileUploadParser, MultiPartParser
 from rest_framework import status
 from django.contrib.auth import get_user_model
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 
 from user.serializers import UserSerializer
 from drama.models import *
@@ -32,6 +34,13 @@ class UserViewSet(APIView) :
         serializer = UserSerializer(found_user)
 
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+class GetUserByToken(APIView):
+
+    def post(self, request):
+        token = Token.objects.get(key=request.data['token'])
+        user = User.objects.get(id=token.user_id)
+        return Response({'token': token.key, 'name': user.first_name})
 
 class ToggleDramaBookmark(APIView) :
 
