@@ -123,7 +123,7 @@ class NaverCrawler:
                 'broadcasting_end_time': broadcasting_end_time,
                 'broadcasting_day': broadcasting_day,
                 'poster_url': poster_url,
-                'episode': episode}
+                'episode': episode.replace("회","")}
 
     def get_genre(self, keyword):
         html_for_genre = self.search_keyword(f'{keyword} 장르')
