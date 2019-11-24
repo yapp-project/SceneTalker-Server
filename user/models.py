@@ -10,4 +10,4 @@ class User(AbstractUser) :
     drama_bookmark = models.ManyToManyField(Drama, blank=True)
 
     def __str__(self) :
-        return self.username
+        return '이메일 : {} , 닉네임 : {}'.format(self.email, self.username)

@@ -22,7 +22,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.episode = self.scope['url_route']['kwargs']['episode']
         self.user_id = self.scope['url_route']['kwargs']['user_id']
         user = User.objects.get(id=self.user_id)
-        self.user_name = user.first_name
+        self.user_name = user.username
         self.room_group_name = 'chat_%s' % self.drama_id
         
         count = self.set_count(self.channel_layer, self.room_group_name, 1)

@@ -1,12 +1,16 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from drama.models import DramaSerializer
+from django.conf import settings
 
 from allauth.account import app_settings as allauth_settings
 from allauth.utils import email_address_exists
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 from django.utils.translation import ugettext_lazy as _
+
+from rest_framework import serializers, exceptions
+from rest_framework.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -21,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
     username = serializers.CharField(required=True, write_only=True)
-    first_name = serializers.CharField(required=True, write_only=True)
+    # first_name = serializers.CharField(required=True, write_only=True)
     password1 = serializers.CharField(required=True, write_only=True)
     password2 = serializers.CharField(required=True, write_only=True)
 
@@ -40,12 +44,12 @@ class RegisterSerializer(serializers.Serializer):
 
         return get_adapter().clean_password(password)
 
-    def validate_first_name(self, first_name) :
-        if (first_name,) in User.objects.all().values_list('first_name') :
-            raise serializers.ValidationError(
-                    _("The first name is already registered"))
+    # def validate_first_name(self, first_name) :
+    #     if (first_name,) in User.objects.all().values_list('first_name') :
+    #         raise serializers.ValidationError(
+    #                 _("The first name is already registered"))
         
-        return first_name
+    #     return first_name
 
     def validate(self, data):
         if data['password1'] != data['password2']:

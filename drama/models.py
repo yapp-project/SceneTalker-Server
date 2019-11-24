@@ -87,3 +87,14 @@ class DramaSerializer(TaggitSerializer, serializers.ModelSerializer):
     def get_is_bookmarked_by_me(self, drama):
         request_user = self.context['request'].user
         return drama in request_user.drama_bookmark.all()
+
+class BookmarkDramaSerializer(TaggitSerializer, serializers.ModelSerializer):
+
+    class Meta:
+        model = Drama
+        fields = (
+            'id',
+            'title',
+            'poster_url',
+            'broadcasting_station',
+        )

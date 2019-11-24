@@ -10,6 +10,7 @@ from rest_framework.authtoken.models import Token
 
 from user.serializers import UserSerializer
 from drama.models import *
+from feed.models import PostSerializer
 
 User = get_user_model()
 
@@ -38,6 +39,14 @@ class UserViewSet(APIView) :
 class GetUserByToken(APIView):
 
     def post(self, request):
+
+        """
+            넘겨준 Token에 해당하는 User의 Token.key 와 User.id
+
+            # Body
+                - token
+        """
+
         token = Token.objects.get(key=request.data['token'])
         user = User.objects.get(id=token.user_id)
         return Response({'token': token.key, 'user_id': user.id})
@@ -45,6 +54,13 @@ class GetUserByToken(APIView):
 class ToggleDramaBookmark(APIView) :
 
     def post(self, request, drama_id, format=None) :
+
+        """
+            # Header
+                - Authorization : Token
+            # Path Params
+                - drama_id : 드라마 id
+        """
 
         user = request.user
 
@@ -67,13 +83,97 @@ class GetRealTimeUserBestDrama(APIView) :
 
     def get(self, request, format=None) :
 
+        """
+            현재 방영중인 드라마 중에서 가장 시청률이 높은 드라마 정보
+
+            # Header
+                - Authorization : Token
+        """
+
         user = request.user
 
-        user_drama_bookmarks = user.drama_bookmark.filter(is_broadcasting=True).first()
+        user_drama_best_bookmark = user.drama_bookmark.filter(is_broadcasting=True).first()
+
+        serializer = BookmarkDramaSerializer(user_drama_best_bookmark)
+
+        print(user_drama_best_bookmark)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class GetUserBookmarkDramaList(APIView) :
+
+    def get(self, request, format=None) :
+
+        """
+            # Header
+                - Authorization : Token
+        """
+
+        user = request.user
+
+        user_drama_bookmarks = user.drama_bookmark.all()
+
+        serializer = BookmarkDramaSerializer(user_drama_bookmarks, many=True)
 
         print(user_drama_bookmarks)
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+class GetUserWritePostList(APIView) :
+
+    def get(self, request, format=None) :
+
+        """
+            # Header
+                - Authorization : Token
+        """
+
+        user = request.user
+
+        user_write_posts = user.post_set.all()
+
+        serializer = PostSerializer(user_write_posts, many=True, context={'request': request})
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class GetUserLikePostList(APIView) :
+
+    def get(self, request, format=None) :
+
+        """
+            # Header
+                - Authorization : Token
+        """
+
+        user = request.user
+
+        user_like_posts = user.likes.all()
+
+        serializer = PostSerializer(user_like_posts, many=True, context={'request': request})
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ChangeUsername(APIView) :
+
+    def put(self, request, format=None) :
+
+        """
+            # Header
+                - Authorization : Token
+            # Body
+                - username
+        """
+
+        user = request.user
+
+        new_username = request.data.get("username")
+
+        if new_username in list(User.objects.values_list("username", flat=True)) :
+            return Response(status=status.HTTP_304_NOT_MODIFIED)
+        else :
+            user.username = new_username
+            user.save()
+            return Response(status=status.HTTP_200_OK)
 
 class PutUserProfileImage(APIView) :
 
