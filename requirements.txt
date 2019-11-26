@@ -46,3 +46,4 @@ pymysql==0.9.3
 drf-yasg==1.17.0
 boto3==1.10.14
 django-storages==1.7.2
+drf-tracking==1.5.0
