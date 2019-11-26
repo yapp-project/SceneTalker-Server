@@ -98,21 +98,21 @@ class NaverCrawler:
         try:
             episode = soup.find('dl', class_='turn_info_desc').find('strong').text
         except AttributeError:
-            episode = '알수없음'
+            episode = '0'
 
         try:
             datetime_info = detail.find('span').text.strip()
             broadcasting_day = parse_day(datetime_info.split('(')[1].split(')')[0])
             time_info = datetime_info.split(') ')[1]
-            if time_info[:2] == '오전':
+            if '오전' in time_info:
                 broadcasting_start_time = datetime.strptime(time_info[3:], "%H:%M") - timedelta(minutes=10)
             else:
-                broadcasting_start_time = datetime.strptime(f'{int(time_info[3:5]) + 12}{time_info[5:]}',
-                                                            "%H:%M") - timedelta(minutes=10)
+                converted_time = f'{int(time_info[3:5]) + 12}{time_info[5:]}'
+                broadcasting_start_time = datetime.strptime(converted_time, "%H:%M") - timedelta(minutes=10)
             broadcasting_end_time = broadcasting_start_time + timedelta(hours=1, minutes=30)
         except Exception as e:
             print(f'드라마: {keyword} 오류: {e}')
-            return None
+            return {'status': 'error', 'is_broadcasting': is_broadcasting}
 
         return {'title': keyword,
                 'rating': rating,
@@ -123,7 +123,8 @@ class NaverCrawler:
                 'broadcasting_end_time': broadcasting_end_time,
                 'broadcasting_day': broadcasting_day,
                 'poster_url': poster_url,
-                'episode': episode.replace("회","")}
+                'episode': episode.replace('회', ''),
+                'status': 'success'}
 
     def get_genre(self, keyword):
         html_for_genre = self.search_keyword(f'{keyword} 장르')
@@ -152,12 +153,21 @@ def parse_day(day):
 
 
 def update_drama():
+    '''
+    대부분 시간정보를 가져오다가 오류가 날 것.
+    1. 방영종료여서 시간정보가 없다.
+        오류가 났을때 방영중이 아니면 is_broadcasting을 false로 해줘서 앞으로 업데이트 처리를 안한다.
+    2. 예외적으로 텍스트가 더 붙는다.
+        오류가 났을때 방영중이면 곧 사라질것이라 생각하고 pass한다. ex)11월21일 결방
+    3. 알수없다.
+        뭐 어떻게해 이걸
+    '''
     crawler = NaverCrawler()
     qs = Drama.objects.filter(is_broadcasting=True)
     title_list = [drama.title for drama in qs]
     for title in title_list:
         detail = crawler.get_detail(title)
-        if detail:
+        if detail['status'] == 'success':
             drama = Drama.objects.get(title=title)
             if (drama.episode != detail['episode']) and (detail['episode'][0].isdigit()):
                 DramaEachEpisode.objects.create(drama=drama, episode=detail['episode'])
@@ -166,12 +176,15 @@ def update_drama():
                                                      is_broadcasting=detail['is_broadcasting'],
                                                      episode=detail['episode'])
         else:
-            Drama.objects.filter(title=title).update(is_broadcasting=False)
+            if detail['is_broadcasting'] is False:
+                Drama.objects.filter(title=title).update(is_broadcasting=False)
+            else:
+                continue
 
     for live_drama in crawler.get_live_drama_list():
         if live_drama not in title_list:
             detail = crawler.get_detail(live_drama)
-            if detail:
+            if detail['status'] == 'success':
                 drama = Drama.objects.create(title=detail['title'],
                                              rating=detail['rating'],
                                              summary=detail['summary'],
