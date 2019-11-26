@@ -1,11 +1,12 @@
 from .models import Post, Comment, PostSerializer, CommentSerializer, Feed
+from rest_framework_tracking.mixins import LoggingMixin
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 
-class PostListCreateAPIView(APIView):
+class PostListCreateAPIView(LoggingMixin, APIView):
     def get(self, request, feed_id):
         """
             피드의 게시물 리스트 불러오는 API
@@ -43,7 +44,7 @@ class PostListCreateAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PostRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class PostRetrieveUpdateDestroyAPIView(LoggingMixin, generics.RetrieveUpdateDestroyAPIView):
     """
         게시물 조회 & 수정 & 삭제 API
 
@@ -56,7 +57,7 @@ class PostRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PostSerializer
 
 
-class PostLikesUpdateAPIView(APIView):
+class PostLikesUpdateAPIView(LoggingMixin, APIView):
     """
         게시물 좋아요 API
 
@@ -76,7 +77,7 @@ class PostLikesUpdateAPIView(APIView):
         return Response()
 
 
-class CommentListCreateAPIView(APIView):
+class CommentListCreateAPIView(LoggingMixin, APIView):
     def get(self, request, feed_id, post_id):
         """
             게시물의 댓글 리스트 불러오는 API
@@ -110,7 +111,7 @@ class CommentListCreateAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CommentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class CommentRetrieveUpdateDestroyAPIView(LoggingMixin, generics.RetrieveUpdateDestroyAPIView):
     """
         댓글 조회 & 수정 & 삭제 API
 

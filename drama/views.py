@@ -1,3 +1,4 @@
+from rest_framework_tracking.mixins import LoggingMixin
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -7,7 +8,7 @@ from datetime import datetime
 from .utils.crawler import update_drama
 
 
-class DramaListView(generics.ListAPIView):
+class DramaListView(LoggingMixin, generics.ListAPIView):
     """
         방영중인 드라마 리스트를 불러오는 API
 
@@ -39,7 +40,7 @@ class DramaListView(generics.ListAPIView):
         return Response(serializer.data)
 
 
-class DramaEachEpisodeList(APIView):
+class DramaEachEpisodeList(LoggingMixin, APIView):
     """
         해당 드라마의 회차별 고구마, 사이다 개수 리스트를 불러오는 API
 
