@@ -146,20 +146,20 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 
 SITE_ID = 1
 
-#This is required otherwise it asks for email server
+# This is required otherwise it asks for email server
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_REQUIRED = True   
+ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 
-#Following is added to enable registration with email instead of username
+# Following is added to enable registration with email instead of username
 AUTHENTICATION_BACKENDS = (
- # Needed to login by username in Django admin, regardless of `allauth`
- "django.contrib.auth.backends.ModelBackend",
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
 
- # `allauth` specific authentication methods, such as login by e-mail
- "allauth.account.auth_backends.AuthenticationBackend",
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
 )
 
 # Channels
@@ -174,8 +174,24 @@ CHANNEL_LAYERS = {
 }
 
 CRONJOBS = [
-    ('0 16 * * *', 'drama.utils.crawler.update_drama', '> /home/ubuntu/scenetalker/SceneTalker-Server/drama/utils/update.log 2>&1'),
+    ('0 16 * * *', 'drama.utils.crawler.update_drama',
+     '> /home/ubuntu/scenetalker/SceneTalker-Server/drama/utils/update.log 2>&1'),
 ]
 CRONTAB_LOCK_JOBS = True
 CRONTAB_DJANGO_SETTINGS_MODULE = 'SceneTalker.settings.production'
 
+LOGGING = {'version': 1,
+           'disable_existing_loggers': False,
+           'handlers':
+               {'file':
+                    {'level': 'DEBUG',
+                     'class': 'logging.FileHandler',
+                     'filename': '/home/ubuntu/scenetalker/SceneTalker-Server/debug.log'},
+                },
+           'loggers': {'django':
+                           {'handlers': ['file'],
+                            'level': 'DEBUG',
+                            'propagate': True,
+                            },
+                       },
+           }
