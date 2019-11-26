@@ -180,18 +180,34 @@ CRONJOBS = [
 CRONTAB_LOCK_JOBS = True
 CRONTAB_DJANGO_SETTINGS_MODULE = 'SceneTalker.settings.production'
 
-LOGGING = {'version': 1,
-           'disable_existing_loggers': False,
-           'handlers':
-               {'file':
-                    {'level': 'DEBUG',
-                     'class': 'logging.FileHandler',
-                     'filename': '/home/ubuntu/scenetalker/SceneTalker-Server/debug.log'},
-                },
-           'loggers': {'django':
-                           {'handlers': ['file'],
-                            'level': 'DEBUG',
-                            'propagate': True,
-                            },
-                       },
-           }
+LOGGING = {
+    'version': 1,
+    'diable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s [%(levelname)8s] %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard'
+        },
+        'logfile': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024 * 1024 * 5,   # 로그 파일 당 10M 까지
+            'backupCount': 5,              # 로그 파일을 최대 10개까지 유지
+            # 'class': 'logging.FileHandler',
+            'filename': '/home/ubuntu/scenetalker/SceneTalker-Server/debug.log',
+            'formatter': 'standard'
+        },
+    },
+    'loggers': {
+        'default': {
+            'level': 'DEBUG',               # 로거의 기본 레벨. 이 레벨이 우선시 된다.
+            'handlers': ['console', 'logfile']
+        },
+    },
+}
