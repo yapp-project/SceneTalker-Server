@@ -6,6 +6,8 @@ from django.conf.urls.static import static
 app_name = "user"
 urlpatterns = [
     path("authenticate/", view = views.GetUserByToken.as_view()),
+    path("unregistration/", view = views.UnRegistrationUser.as_view()),
+    path("check-duplicated/", view = views.CheckUsernameIsDuplicated.as_view()),
     path("bookmark-best-drama/", view = views.GetRealTimeUserBestDrama.as_view()),
     path("bookmark-dramas/", view = views.GetUserBookmarkDramaList.as_view()),
     path("posts/write/", view=views.GetUserWritePostList.as_view()),

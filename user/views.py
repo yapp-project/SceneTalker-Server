@@ -1,11 +1,8 @@
-# from django.contrib.auth.models import User, Group
-from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.parsers import FileUploadParser, MultiPartParser
+from rest_framework.parsers import MultiPartParser
 from rest_framework import status
 from django.contrib.auth import get_user_model
-from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 
 from user.serializers import UserSerializer
@@ -41,7 +38,7 @@ class GetUserByToken(APIView):
     def post(self, request):
 
         """
-            넘겨준 Token에 해당하는 User의 Token.key 와 User.id
+            넘겨준 Token에 해당하는 User의 Token.key 와 User.id, Username을 넘겨줌
 
             # Body
                 - token
@@ -49,13 +46,15 @@ class GetUserByToken(APIView):
 
         token = Token.objects.get(key=request.data['token'])
         user = User.objects.get(id=token.user_id)
-        return Response({'token': token.key, 'user_id': user.id})
+        return Response({'token': token.key, 'user_id': user.id, 'username' : user.username})
 
 class ToggleDramaBookmark(APIView) :
 
     def post(self, request, drama_id, format=None) :
 
         """
+            드라마 북마크 상태 toggle
+
             # Header
                 - Authorization : Token
             # Path Params
@@ -141,6 +140,8 @@ class GetUserLikePostList(APIView) :
     def get(self, request, format=None) :
 
         """
+            유저가 "좋아요" 한 게시물 리스트
+
             # Header
                 - Authorization : Token
         """
@@ -158,6 +159,8 @@ class ChangeUsername(APIView) :
     def put(self, request, format=None) :
 
         """
+            유저 닉네임 변경
+
             # Header
                 - Authorization : Token
             # Body
@@ -174,6 +177,46 @@ class ChangeUsername(APIView) :
             user.username = new_username
             user.save()
             return Response(status=status.HTTP_200_OK)
+
+class UnRegistrationUser(APIView) :
+
+    def put(self, request, format=None) :
+
+        """
+            회원탈퇴
+
+            # Header
+                - Authorization : Token 
+        """
+
+        user = request.user
+
+        User.objects.filter(pk=user.pk).update(is_active=False, email="None")
+
+        return Response(status=status.HTTP_200_OK)
+
+class CheckUsernameIsDuplicated(APIView) :
+
+    def post(self, request, format=None) :
+
+        """
+            회원가입 시 닉네임 중복 체크
+
+            # Body
+                - username
+
+            # Response
+                - 중복 O : {"result" : "duplicated"}
+                - 중복 X : {"result" : "ok"}
+        """
+
+        username = request.data.get("username")
+
+        if username in list(User.objects.values_list("username", flat=True)) :
+            return Response({"result" : "duplicated"})
+
+        else :
+            return Response({"result" : "ok"})
 
 class PutUserProfileImage(APIView) :
 

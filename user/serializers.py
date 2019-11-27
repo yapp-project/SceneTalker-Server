@@ -15,8 +15,6 @@ from rest_framework.exceptions import ValidationError
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
-    
-    # drama_bookmark = DramaSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
@@ -25,7 +23,6 @@ class UserSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
     username = serializers.CharField(required=True, write_only=True)
-    # first_name = serializers.CharField(required=True, write_only=True)
     password1 = serializers.CharField(required=True, write_only=True)
     password2 = serializers.CharField(required=True, write_only=True)
 
@@ -43,13 +40,6 @@ class RegisterSerializer(serializers.Serializer):
                     _("Password is too short"))
 
         return get_adapter().clean_password(password)
-
-    # def validate_first_name(self, first_name) :
-    #     if (first_name,) in User.objects.all().values_list('first_name') :
-    #         raise serializers.ValidationError(
-    #                 _("The first name is already registered"))
-        
-    #     return first_name
 
     def validate(self, data):
         if data['password1'] != data['password2']:
