@@ -78,7 +78,7 @@ class PostLikesUpdateAPIView(LoggingMixin, APIView):
         else:
             post.likes.add(request.user)
 
-        return Response()
+        return Response({'result': 'success'})
 
 
 class CommentListCreateAPIView(LoggingMixin, APIView):
