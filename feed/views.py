@@ -4,9 +4,12 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 
-class PostListCreateAPIView(LoggingMixin, APIView):
+class PostListCreateAPIView(APIView):
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+
     def get(self, request, feed_id):
         """
             피드의 게시물 리스트 불러오는 API
@@ -44,7 +47,7 @@ class PostListCreateAPIView(LoggingMixin, APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PostRetrieveUpdateDestroyAPIView(LoggingMixin, generics.RetrieveUpdateDestroyAPIView):
+class PostRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
         게시물 조회 & 수정 & 삭제 API
 
