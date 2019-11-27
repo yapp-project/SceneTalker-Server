@@ -38,9 +38,10 @@ class PostListCreateAPIView(APIView):
                 - content : 게시물 내용(Required)
                 - image : image 객체
         """
-        request.data['feed'] = feed_id
-        request.data['author'] = request.user.id
-        serializer = PostSerializer(data=request.data, context={'request': request})
+        copied_request_data = request.data.copy()
+        copied_request_data['feed'] = feed_id
+        copied_request_data['author'] = request.user.id
+        serializer = PostSerializer(data=copied_request_data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
