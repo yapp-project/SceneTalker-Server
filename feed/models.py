@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from rest_framework import serializers
 from drama.models import Drama
+from feed.utils.imagepath import user_directory_path
 
 
 class Feed(models.Model):
@@ -21,7 +22,7 @@ class Post(models.Model):
     feed = models.ForeignKey(Feed, on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
-    image = models.ImageField(blank=True)  # s3에 올라가게 해야함
+    image = models.ImageField(blank=True, upload_to=user_directory_path)  # s3에 올라가게 해야함
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='likes', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
