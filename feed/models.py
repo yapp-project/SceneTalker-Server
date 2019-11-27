@@ -44,6 +44,7 @@ class Post(models.Model):
 class PostSerializer(serializers.ModelSerializer):
     is_mine = serializers.SerializerMethodField()
     is_liked_by_me = serializers.SerializerMethodField()
+    author_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -59,7 +60,8 @@ class PostSerializer(serializers.ModelSerializer):
             'like_counts',
             'comment_counts',
             'is_mine',
-            'is_liked_by_me'
+            'is_liked_by_me',
+            'author_name'
         )
 
     def get_is_mine(self, obj):
@@ -69,6 +71,9 @@ class PostSerializer(serializers.ModelSerializer):
     def get_is_liked_by_me(self, obj):
         request_user = self.context['request'].user
         return request_user in obj.likes.all()
+
+    def get_author_name(self, obj):
+        return obj.author.username
 
 
 class Comment(models.Model):
@@ -87,6 +92,7 @@ class Comment(models.Model):
 
 class CommentSerializer(serializers.ModelSerializer):
     is_mine = serializers.SerializerMethodField()
+    author_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
@@ -95,3 +101,6 @@ class CommentSerializer(serializers.ModelSerializer):
     def get_is_mine(self, obj):
         request_user = self.context['request'].user
         return obj.author == request_user
+
+    def get_author_name(self, obj):
+        return obj.author.username
