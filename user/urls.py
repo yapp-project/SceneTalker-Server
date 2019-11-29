@@ -16,5 +16,4 @@ urlpatterns = [
     path("profile-image/", view = views.PutUserProfileImage.as_view()),
     path("<str:username>/", view = views.UserViewSet.as_view()),
     path("<int:drama_id>/bookmark/", view=views.ToggleDramaBookmark.as_view()),
-    # path("<str:username>/upload/<str:filename>/", view = views.PutUserProfileImage.as_view()),
 ]

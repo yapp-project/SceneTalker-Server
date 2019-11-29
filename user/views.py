@@ -108,6 +108,8 @@ class GetUserBookmarkDramaList(APIView) :
     def get(self, request, format=None) :
 
         """
+            유저가 "북마크" 한 드라마 리스트
+
             # Header
                 - Authorization : Token
         """
@@ -127,6 +129,8 @@ class GetUserWritePostList(APIView) :
     def get(self, request, format=None) :
 
         """
+            유저가 "작성" 한 게시물 리스트
+
             # Header
                 - Authorization : Token
         """
@@ -222,22 +226,19 @@ class CheckUsernameIsDuplicated(APIView) :
         else :
             return Response({"result" : "ok"})
 
-# class PutUserProfileImage(APIView) :
-
-#     parser_classes = [MultiPartParser]
-
-#     def put(self, request, username, filename, format=None) :
-
-#         user = request.user
-
-#         file_obj = request.data['file']
-
-#         user.profile_image.save(filename, file_obj, save=True)
-#         return Response(status=status.HTTP_200_OK)
-
 class PutUserProfileImage(APIView) :
 
     def put(self, request, format=None) :
+
+        """
+            유저 프로필 사진 업데이트
+
+            # Header
+                - Authorization : Token
+
+            # Body
+                - file : image-file
+        """
 
         user = request.user
 
