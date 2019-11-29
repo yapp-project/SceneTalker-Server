@@ -49,7 +49,8 @@ class GetUserByToken(APIView):
         return Response({'token': token.key, 
                         'user_id': user.id, 
                         'username' : user.username, 
-                        'email' : user.email})
+                        'email' : user.email,
+                        'profile_image' : user.profile_image})
 
 class ToggleDramaBookmark(APIView) :
 
@@ -221,15 +222,28 @@ class CheckUsernameIsDuplicated(APIView) :
         else :
             return Response({"result" : "ok"})
 
+# class PutUserProfileImage(APIView) :
+
+#     parser_classes = [MultiPartParser]
+
+#     def put(self, request, username, filename, format=None) :
+
+#         user = request.user
+
+#         file_obj = request.data['file']
+
+#         user.profile_image.save(filename, file_obj, save=True)
+#         return Response(status=status.HTTP_200_OK)
+
 class PutUserProfileImage(APIView) :
 
-    parser_classes = [MultiPartParser]
-
-    def put(self, request, username, filename, format=None) :
+    def put(self, request, format=None) :
 
         user = request.user
 
         file_obj = request.data['file']
 
-        user.profile_image.save(filename, file_obj, save=True)
+        user.profile_image = file_obj
+        user.save()
+
         return Response(status=status.HTTP_200_OK)
