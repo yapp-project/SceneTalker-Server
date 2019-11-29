@@ -76,7 +76,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             print(self.room_group_name, kind, count + 1)
 
-            if count % 10 == 0:
+            if count != 0 and count % 10 == 0:
                 try :
                     drama_each_episode = DramaEachEpisode.objects.get(drama__id=self.drama_id, 
                                                                 episode=self.episode)
