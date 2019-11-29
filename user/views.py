@@ -38,7 +38,7 @@ class GetUserByToken(APIView):
     def post(self, request):
 
         """
-            넘겨준 Token에 해당하는 User의 Token.key 와 User.id, Username을 넘겨줌
+            넘겨준 Token에 해당하는 User의 Token.key 와 User.id, Username, Email을 넘겨줌
 
             # Body
                 - token
@@ -46,7 +46,10 @@ class GetUserByToken(APIView):
 
         token = Token.objects.get(key=request.data['token'])
         user = User.objects.get(id=token.user_id)
-        return Response({'token': token.key, 'user_id': user.id, 'username' : user.username})
+        return Response({'token': token.key, 
+                        'user_id': user.id, 
+                        'username' : user.username, 
+                        'email' : user.email})
 
 class ToggleDramaBookmark(APIView) :
 
