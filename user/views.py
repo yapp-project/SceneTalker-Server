@@ -49,8 +49,7 @@ class GetUserByToken(APIView):
         return Response({'token': token.key, 
                         'user_id': user.id, 
                         'username' : user.username, 
-                        'email' : user.email,
-                        'profile_image' : user.profile_image})
+                        'email' : user.email})
 
 class ToggleDramaBookmark(APIView) :
 
