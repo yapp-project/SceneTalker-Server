@@ -38,7 +38,7 @@ class GetUserByToken(APIView):
     def post(self, request):
 
         """
-            넘겨준 Token에 해당하는 User의 Token.key 와 User.id, Username을 넘겨줌
+            넘겨준 Token에 해당하는 User의 Token.key 와 User.id, Username, Email을 넘겨줌
 
             # Body
                 - token
@@ -46,7 +46,10 @@ class GetUserByToken(APIView):
 
         token = Token.objects.get(key=request.data['token'])
         user = User.objects.get(id=token.user_id)
-        return Response({'token': token.key, 'user_id': user.id, 'username' : user.username})
+        return Response({'token': token.key, 
+                        'user_id': user.id, 
+                        'username' : user.username, 
+                        'email' : user.email})
 
 class ToggleDramaBookmark(APIView) :
 
@@ -104,6 +107,8 @@ class GetUserBookmarkDramaList(APIView) :
     def get(self, request, format=None) :
 
         """
+            유저가 "북마크" 한 드라마 리스트
+
             # Header
                 - Authorization : Token
         """
@@ -123,6 +128,8 @@ class GetUserWritePostList(APIView) :
     def get(self, request, format=None) :
 
         """
+            유저가 "작성" 한 게시물 리스트
+
             # Header
                 - Authorization : Token
         """
@@ -220,13 +227,23 @@ class CheckUsernameIsDuplicated(APIView) :
 
 class PutUserProfileImage(APIView) :
 
-    parser_classes = [MultiPartParser]
+    def put(self, request, format=None) :
 
-    def put(self, request, username, filename, format=None) :
+        """
+            유저 프로필 사진 업데이트
+
+            # Header
+                - Authorization : Token
+
+            # Body
+                - file : image-file
+        """
 
         user = request.user
 
         file_obj = request.data['file']
 
-        user.profile_image.save(filename, file_obj, save=True)
+        user.profile_image = file_obj
+        user.save()
+
         return Response(status=status.HTTP_200_OK)
