@@ -2,6 +2,8 @@ from .base import *
 import pymysql
 import json
 
+DEBUG = False
+LANGUAGE_CODE = 'en'
 pymysql.install_as_MySQLdb()
 SECRET_DIR = os.path.join(BASE_DIR, 'conf')
 secrets = json.load(open(os.path.join(SECRET_DIR, 'secrets.json'), 'rb'))
@@ -28,3 +30,39 @@ AWS_DEFAULT_ACL = secrets['AWS_DEFAULT_ACL']
 AWS_S3_REGION_NAME = secrets['AWS_S3_REGION_NAME']
 AWS_S3_SIGNATURE_VERSION = secrets['AWS_S3_SIGNATURE_VERSION']
 AWS_STORAGE_BUCKET_NAME = secrets['AWS_STORAGE_BUCKET_NAME']
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'access': {
+            'level': 'INFO',
+            'filename': 'SceneTalker/settings/logs/request-access.log',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'when': "midnight",
+            'backupCount': 3,  # 로그 파일을 최대 5개까지 유지
+            'formatter': 'verbose',
+        },
+        'error': {
+            'level': 'WARNING',
+            'filename': 'SceneTalker/settings/logs/request-error.log',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'when': "midnight",
+            'backupCount': 3,  # 로그 파일을 최대 5개까지 유지
+            'formatter': 'verbose',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
+            'datefmt': '%Y/%b/%d %H:%M:%S'
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['access', 'error'],
+            'level': 'INFO',  # change debug level as appropiate
+            'propagate': False,
+        },
+    },
+}
