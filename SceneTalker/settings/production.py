@@ -37,7 +37,7 @@ LOGGING = {
     'handlers': {
         'access': {
             'level': 'INFO',
-            'filename': 'SceneTalker/settings/logs/request-access.log',
+            'filename': '/home/ubuntu/scenetalker/SceneTalker-Server/SceneTalker/settings/logs/request-access.log',
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'when': "midnight",
             'backupCount': 3,  # 로그 파일을 최대 5개까지 유지
@@ -45,7 +45,7 @@ LOGGING = {
         },
         'error': {
             'level': 'WARNING',
-            'filename': 'SceneTalker/settings/logs/request-error.log',
+            'filename': '/home/ubuntu/scenetalker/SceneTalker-Server/SceneTalker/settings/logs/request-error.log',
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'when': "midnight",
             'backupCount': 3,  # 로그 파일을 최대 5개까지 유지
