@@ -31,6 +31,10 @@ class Post(models.Model):
         ordering = ["-created_at"]
 
     @property
+    def post_drama_title(self):
+        return self.feed.drama.title
+
+    @property
     def like_counts(self):
         return self.likes.all().count()
 
@@ -62,7 +66,8 @@ class PostSerializer(serializers.ModelSerializer):
             'comment_counts',
             'is_mine',
             'is_liked_by_me',
-            'author_name'
+            'author_name',
+            'post_drama_title'
         )
 
     def get_is_mine(self, obj):
