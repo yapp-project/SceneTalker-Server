@@ -21,7 +21,7 @@ class PostListCreateAPIView(APIView):
                 - content : 게시물 검색 내용
         """
         query_params = request.query_params.get('content')
-        if query_params != '' :
+        if query_params :
             user = request.user
             user.recent_searches.add(query_params)
         posts = Feed.objects.prefetch_related('post_set').get(id=feed_id).post_set.all()
