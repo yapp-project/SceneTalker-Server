@@ -5,7 +5,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 
-from user.serializers import UserSerializer
+from user.serializers import UserSerializer, UserRecentSearchesSerializer
 from drama.models import *
 from feed.models import PostSerializer
 
@@ -245,5 +245,28 @@ class PutUserProfileImage(APIView) :
 
         user.profile_image = file_obj
         user.save()
+
+        return Response(status=status.HTTP_200_OK)
+
+class UserRecentSearchesAPIView(APIView) :
+
+    def get(self, request, format=None) :
+
+        user = request.user
+
+        serializer = UserRecentSearchesSerializer(user)
+
+        return Response(data=serializer.data ,status=status.HTTP_200_OK)
+
+    def delete(self, request, format=None) :
+
+        user = request.user
+
+        search_word = request.data.get("search_word")
+
+        if search_word == '' :
+            user.recent_searches.clear()
+
+        user.recent_searches.remove(search_word)
 
         return Response(status=status.HTTP_200_OK)

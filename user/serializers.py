@@ -12,6 +12,8 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, exceptions
 from rest_framework.exceptions import ValidationError
 
+from taggit_serializer.serializers import (TagListSerializerField, TaggitSerializer)
+
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
@@ -19,6 +21,12 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'first_name', 'profile_image']
+
+class UserRecentSearchesSerializer(TaggitSerializer, serializers.ModelSerializer) :
+    recent_searches = TagListSerializerField()
+    class Meta:
+        model = User
+        fields = ['recent_searches']
 
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
