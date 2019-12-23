@@ -72,12 +72,20 @@ class ToggleDramaBookmark(APIView) :
 
         if drama in user.drama_bookmark.all() :
             user.drama_bookmark.remove(drama)
+            result = {
+                "result" : "OK",
+                "description" : "remove"
+            }
         else :
             user.drama_bookmark.add(drama)
+            result = {
+                "result" : "OK",
+                "description" : "add"
+            }
 
         user.save()
 
-        return Response({"description" : "OK"},status=status.HTTP_200_OK)
+        return Response(result,status=status.HTTP_200_OK)
 
 class GetRealTimeUserBestDrama(APIView) :
 
