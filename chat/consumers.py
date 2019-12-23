@@ -11,7 +11,13 @@ User = get_user_model()
 class ChatConsumer(AsyncWebsocketConsumer):
     def set_count(self, channel_layer, group_name, count_value) :
 
-        count = getattr(channel_layer, group_name, 0)
+        drama_each_episode = DramaEachEpisode.objects.get(drama__id=self.drama_id, 
+                                                                episode=self.episode)
+        count = 0
+        if 'soda' in group_name :
+            count = getattr(channel_layer, group_name, drama_each_episode.soda_count)
+        elif 'potato' in group_name :
+            count = getattr(channel_layer, group_name, drama_each_episode.sweet_potato_count)
 
         setattr(channel_layer, group_name, count + count_value)
 
