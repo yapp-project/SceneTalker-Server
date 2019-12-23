@@ -98,25 +98,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print(drama_each_episode)
 
             await self.channel_layer.group_send(
-                    self.room_group_name,
-                    {
-                        'type': 'chat_message',
-                        'kind': str(kind),
-                        'message': str(count),
-                        'sender': 'AdminServer'
-                    }
-                )
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'kind': str(kind),
+                    'message': str(count),
+                    'sender': 'AdminServer'
+                }
+            )
 
-            if count != 0 and count % 10 == 0 :
-                await self.channel_layer.group_send(
-                    self.room_group_name,
-                    {
-                        'type': 'chat_message',
-                        'kind': str(kind),
-                        'message': str(count),
-                        'sender': 'AdminServerPang'
-                    }
-                )
 
     # Receive message from room group
     async def chat_message(self, event):
