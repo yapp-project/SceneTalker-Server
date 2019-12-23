@@ -82,21 +82,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             print(self.room_group_name, kind, count + 1)
 
-            if count != 0 and count % 3 == 0:
-                try :
-                    drama_each_episode = DramaEachEpisode.objects.get(drama__id=self.drama_id, 
-                                                                episode=self.episode)
-                except DramaEachEpisode.DoesNotExist :
-                    return
-                
-                if kind == 'soda' :
-                    drama_each_episode.soda_count = count
-                elif kind == 'potato' :
-                    drama_each_episode.sweet_potato_count = count
+            try :
+                drama_each_episode = DramaEachEpisode.objects.get(drama__id=self.drama_id, 
+                                                            episode=self.episode)
+            except DramaEachEpisode.DoesNotExist :
+                return
+            
+            if kind == 'soda' :
+                drama_each_episode.soda_count = count
+            elif kind == 'potato' :
+                drama_each_episode.sweet_potato_count = count
 
-                drama_each_episode.save()
+            drama_each_episode.save()
 
-                print(drama_each_episode)
+            print(drama_each_episode)
 
             await self.channel_layer.group_send(
                     self.room_group_name,
