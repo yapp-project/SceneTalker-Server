@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'profile_image']
+        fields = ['pk', 'email', 'username', 'profile_image']
 
 class UserRecentSearchesSerializer(TaggitSerializer, serializers.ModelSerializer) :
     recent_searches = TagListSerializerField()
