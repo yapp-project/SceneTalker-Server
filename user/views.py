@@ -195,7 +195,7 @@ class ChangeUsername(APIView) :
             result = {
                 "result" : "ok"
             }
-            return Response(status=status.HTTP_200_OK)
+            return Response(result, status=status.HTTP_200_OK)
 
 class UnRegistrationUser(APIView) :
 
@@ -258,7 +258,7 @@ class PutUserProfileImage(APIView) :
         user.profile_image = file_obj
         user.save()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response({"result" : "ok"},status=status.HTTP_200_OK)
 
 class UserRecentSearchesAPIView(APIView) :
 
