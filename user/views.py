@@ -182,7 +182,7 @@ class ChangeUsername(APIView) :
 
         user = request.user
 
-        new_username = request.data["username"]
+        new_username = request.data
 
         if new_username in list(User.objects.values_list("username", flat=True)) :
             result = {
@@ -229,7 +229,7 @@ class CheckUsernameIsDuplicated(APIView) :
                 - 중복 X : {"result" : "ok"}
         """
 
-        username = request.data["username"]
+        username = request.data
 
         if username in list(User.objects.values_list("username", flat=True)) :
             return Response({"result" : "duplicated"})
