@@ -185,10 +185,16 @@ class ChangeUsername(APIView) :
         new_username = request.data.get("username")
 
         if new_username in list(User.objects.values_list("username", flat=True)) :
-            return Response(status=status.HTTP_304_NOT_MODIFIED)
+            result = {
+                "result" : "duplicated"
+            }
+            return Response(result, status=status.HTTP_304_NOT_MODIFIED)
         else :
             user.username = new_username
             user.save()
+            result = {
+                "result" : "ok"
+            }
             return Response(status=status.HTTP_200_OK)
 
 class UnRegistrationUser(APIView) :
