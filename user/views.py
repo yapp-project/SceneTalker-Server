@@ -275,4 +275,4 @@ class UserRecentSearchesAPIView(APIView) :
 
         user.recent_searches.remove(search_word)
 
-        return Response(status=status.HTTP_200_OK)
+        return Response({"result" : "OK"}, status=status.HTTP_200_OK)
