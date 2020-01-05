@@ -32,7 +32,7 @@ class Post(models.Model):
 
     @property
     def user_profile_image(self):
-        return self.author.profile_image
+        return self.author.profile_image.url
 
     @property
     def post_drama_title(self):
