@@ -97,7 +97,7 @@ class Comment(models.Model):
     
     @property
     def get_feed_id(self) :
-        return self.post.feed
+        return self.post.feed.id
 
 
 class CommentSerializer(serializers.ModelSerializer):
