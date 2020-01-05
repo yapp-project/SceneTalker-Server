@@ -106,7 +106,15 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = (
+            'id',
+            'post',
+            'author',
+            'content',
+            'created_at',
+            'updated_at',
+            'get_feed_id'
+        )
 
     def get_is_mine(self, obj):
         request_user = self.context['request'].user
