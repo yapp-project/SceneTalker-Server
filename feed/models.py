@@ -31,6 +31,10 @@ class Post(models.Model):
         ordering = ["-created_at"]
 
     @property
+    def user_profile_image(self):
+        return self.author.profile_image
+
+    @property
     def post_drama_title(self):
         return self.feed.drama.title
 
