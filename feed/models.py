@@ -71,7 +71,8 @@ class PostSerializer(serializers.ModelSerializer):
             'is_mine',
             'is_liked_by_me',
             'author_name',
-            'post_drama_title'
+            'post_drama_title',
+            'user_profile_image',
         )
 
     def get_is_mine(self, obj):
