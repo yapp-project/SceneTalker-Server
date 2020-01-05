@@ -99,6 +99,7 @@ class Comment(models.Model):
 class CommentSerializer(serializers.ModelSerializer):
     is_mine = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
+    post = PostSerializer()
 
     class Meta:
         model = Comment
