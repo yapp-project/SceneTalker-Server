@@ -94,12 +94,15 @@ class Comment(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.post.content, self.content)
+    
+    @property
+    def get_feed_id(self) :
+        return self.post.feed
 
 
 class CommentSerializer(serializers.ModelSerializer):
     is_mine = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
-    post = PostSerializer()
 
     class Meta:
         model = Comment
