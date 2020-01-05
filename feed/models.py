@@ -113,7 +113,7 @@ class CommentSerializer(serializers.ModelSerializer):
             'content',
             'created_at',
             'updated_at',
-            'get_feed_id',
+            'feed_id',
             'is_mine',
             'author_name',
         )
