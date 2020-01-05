@@ -96,7 +96,7 @@ class Comment(models.Model):
         return '{} - {}'.format(self.post.content, self.content)
     
     @property
-    def get_feed_id(self) :
+    def feed_id(self) :
         return self.post.feed.id
 
 
