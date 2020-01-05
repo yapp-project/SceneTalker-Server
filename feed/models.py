@@ -113,7 +113,9 @@ class CommentSerializer(serializers.ModelSerializer):
             'content',
             'created_at',
             'updated_at',
-            'get_feed_id'
+            'get_feed_id',
+            'is_mine',
+            'author_name',
         )
 
     def get_is_mine(self, obj):
