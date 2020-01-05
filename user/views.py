@@ -123,7 +123,7 @@ class GetUserBookmarkDramaList(APIView) :
 
         user_drama_bookmarks = user.drama_bookmark.all()
 
-        serializer = BookmarkDramaSerializer(user_drama_bookmarks, many=True)
+        serializer = DramaSerializer(user_drama_bookmarks, many=True)
 
         print(user_drama_bookmarks)
 
