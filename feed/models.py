@@ -102,6 +102,13 @@ class Comment(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.post.content, self.content)
+
+    @property
+    def user_profile_image(self):
+        try :
+            return self.author.profile_image.url
+        except :
+            return None
     
     @property
     def feed_id(self) :
@@ -124,6 +131,7 @@ class CommentSerializer(serializers.ModelSerializer):
             'feed_id',
             'is_mine',
             'author_name',
+            'user_profile_image',
         )
 
     def get_is_mine(self, obj):
