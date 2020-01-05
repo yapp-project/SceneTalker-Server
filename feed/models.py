@@ -32,7 +32,10 @@ class Post(models.Model):
 
     @property
     def user_profile_image(self):
-        return self.author.profile_image.url
+        try :
+            return self.author.profile_image.url
+        except :
+            return None
 
     @property
     def post_drama_title(self):
