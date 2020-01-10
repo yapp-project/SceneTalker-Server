@@ -24,8 +24,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         return count
 
-    def get_user(self, user_id):
-        return User.objects.get(id=user_id)
+    def get_user(self):
+        return User.objects.get(id=self.user_id)
 
     def get_darama_each_episode(self):
         drama_each_episode = DramaEachEpisode.objects.get(drama__id=self.drama_id, 
