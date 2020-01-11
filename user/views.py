@@ -4,6 +4,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
+from datetime import datetime
 
 from user.serializers import UserSerializer, UserRecentSearchesSerializer
 from drama.models import *
@@ -100,7 +101,11 @@ class GetRealTimeUserBestDrama(APIView) :
 
         user = request.user
 
-        user_drama_best_bookmark = user.drama_bookmark.filter(is_broadcasting=True).first()
+        days_of_week = ['월', '화', '수', '목', '금', '토', '일']
+        user_drama_best_bookmark = user.drama_bookmark.filter(is_broadcasting=True,
+                                broadcasting_day__name__in=[days_of_week[datetime.today().weekday()]],
+                                broadcasting_start_time__lte=datetime.now(),
+                                broadcasting_end_time__gte=datetime.now()).first()
 
         serializer = BookmarkDramaSerializer(user_drama_best_bookmark)
 
