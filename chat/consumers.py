@@ -27,9 +27,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def get_user(self):
         return User.objects.get(id=self.user_id)
 
-    def get_darama_each_episode(self):
+    def get_drama_each_episode(self):
         drama_each_episode = DramaEachEpisode.objects.get(drama__id=self.drama_id, 
-                                                        episode=self.episode)
+                                                            episode=self.episode)
         return drama_each_episode
 
     async def connect(self):
@@ -91,14 +91,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             # print(self.room_group_name, kind, count + 1)
 
-            self.drama_each_episode = self.get_darama_each_episode()
+            drama_each_episode_str = 'drama_each_episode' + self.drama_id + self.episode
+            if drama_each_episode_str not in self.scope :
+                self.scope[drama_each_episode_str] = self.get_drama_each_episode()
             
             if kind == 'soda' :
-                self.drama_each_episode.soda_count = count
+                self.scope[drama_each_episode_str].soda_count = count
             elif kind == 'potato' :
-                self.drama_each_episode.sweet_potato_count = count
+                self.scope[drama_each_episode_str].sweet_potato_count = count
 
-            self.drama_each_episode.save()
+            self.scope[drama_each_episode_str].save()
 
             # print(drama_each_episode)
 
