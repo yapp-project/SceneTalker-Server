@@ -93,7 +93,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             drama_each_episode_str = 'drama_each_episode' + self.drama_id + self.episode
             if drama_each_episode_str not in self.scope :
-                self.scope[drama_each_episode_str] = self.get_drama_each_episode()
+                self.scope[drama_each_episode_str] = await database_sync_to_async(self.get_drama_each_episode)()
             
             if kind == 'soda' :
                 self.scope[drama_each_episode_str].soda_count = count
