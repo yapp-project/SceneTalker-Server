@@ -51,7 +51,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
-        count = self.set_count(self.channel_layer, self.room_group_name, -1)
+        count = await database_sync_to_async(self.set_count)(self.channel_layer, self.room_group_name, -1)
 
         if count - 1 == 0 :
             delattr(self.channel_layer, self.room_group_name)
@@ -87,7 +87,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         elif _type == 'count' :
             kind = text_data_json['kind']
 
-            count = self.set_count(self.channel_layer, self.room_group_name + kind, 1)
+            count = await database_sync_to_async(self.set_count)(self.channel_layer, self.room_group_name + kind, 1)
 
             # print(self.room_group_name, kind, count + 1)
 
