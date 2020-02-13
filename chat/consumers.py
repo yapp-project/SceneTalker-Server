@@ -40,7 +40,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.user_name = self.user.username
         self.room_group_name = 'chat_%s' % self.drama_id
         
-        count = self.set_count(self.channel_layer, self.room_group_name, 1)
+        count = await database_sync_to_async(self.set_count)(self.channel_layer, self.room_group_name, 1)
 
         print("join", self.channel_layer, self.room_group_name, self.user_name, self.episode, count + 1)
         # Join room group
