@@ -34,10 +34,12 @@ class DramaListView(LoggingMixin, generics.ListAPIView):
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+            data = sorted(serializer.data, key=lambda x: x['is_bookmarked_by_me'], reverse=True)
+            return self.get_paginated_response(data)
 
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        data = sorted(serializer.data, key=lambda x: x['is_bookmarked_by_me'], reverse=True)
+        return Response(data)
 
 
 class DramaEachEpisodeList(LoggingMixin, APIView):
