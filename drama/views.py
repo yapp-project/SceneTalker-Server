@@ -53,7 +53,8 @@ class DramaEachEpisodeList(LoggingMixin, APIView):
 
     def get(self, request, drama_id, format=None):
         drama = Drama.objects.get(id=drama_id)
-        queryset = DramaEachEpisode.objects.filter(drama=drama).order_by('-episode')
-        serializer = DramaEachEpisodeSerializer(queryset, many=True)
+        queryset = DramaEachEpisode.objects.filter(drama=drama)
+        ordered = queryset.extra(select={"episode": "CAST(episode AS INTEGER)"}).order_by("-episode")
+        serializer = DramaEachEpisodeSerializer(ordered, many=True)
 
         return Response(data=serializer.data, status=status.HTTP_200_OK)
